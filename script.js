@@ -1,131 +1,211 @@
-//Define Objects and see if it working
+//////////////Define Objects and see if it working////////////////
 console.log("It works!");
 
-bountyInput1 = document.querySelector("#bountyInput1");
-console.log("bountyInput1 ", bountyInput1);
+Input1 = document.querySelector("#Input1");
+console.log("Input1 ", Input1);
 
-bountySubmit = document.querySelector("#bountySubmit");
-console.log("bountySubmit ", bountySubmit);
+Input2 = document.querySelector("#Input2");
+console.log("Input2 ", Input2);
 
-bountySubmit2 = document.querySelector("#bountySubmit2");
-console.log("bountySubmit2 ", bountySubmit2);
+Input3 = document.querySelector("#Input3");
+console.log("Input3 ", Input3);
 
-var bountyList = document.querySelector('#bountyList');
+Input4 = document.querySelector("#Input4");
+console.log("Input4 ", Input4);
 
-var list_of_hits;
-//For TESTING puroses, create a inital list of doom to test create. Once done, remove it. You only
-//create when you do a input
+Input5 = document.querySelector("#Input5");
+console.log("Input5 ", Input5);
 
-var bountyClientInfo;
 
-//Create Bounty 
-var pinBountyPaper = function(bountyClientInfo) { //MUST BE DONE THROUGH GET
 
-	var bountyDiv = document.createElement("div");
-	var bountyPic = document.createElement("div");
-	var bountyListContainer = document.createElement("div");
+var opsList = document.querySelector('#opsList');
 
-	var bountyUL = document.createElement("ul");
-	var bountyName = document.createElement("li");
 
-	bountyDiv.className = "bounty";
-	bountyPic.className = "bountyPic";
-	bountyListContainer.className = "bountyListContainer"
+var list_of_ops;
 
-	bountyName.innerHTML = bountyClientInfo
+var opsClientInfo;
 
-	bountyList.appendChild(bountyDiv)
-	bountyDiv.appendChild(bountyPic)
-	bountyDiv.appendChild(bountyListContainer)
-	bountyListContainer.appendChild(bountyUL)
+//////////////Create the Operartors Display Box////////////////
 
-	bountyUL.appendChild(bountyName)
+
+
+
+
+//////////////Create the Operartors Display Box////////////////
+
+var pinOpsPaper = function(opsClientInfo) { //(Must be done through GET) <- SHOULD NOT BE DONE THROUGH GET
+	
+	var displayContainer = document.querySelector("#displayContainer")
+
+	var opsContainer = document.createElement("div");
+
+	var OpsHeaderContainer = document.createElement("div");
+	var icon = document.createElement("div"); //UNQUIE
+	var name = document.createElement("h3"); //UNQUIE
+
+	var info1 = document.createElement("div");
+	var info2 = document.createElement("div");
+	var info3 = document.createElement("div");
+
+	var country = document.createElement("span"); //UNQUIE
+	var gadget = document.createElement("span"); //UNQUIE
+	var weapon = document.createElement("span"); //UNQUIE
+
+	var smallerIcon1 = document.createElement("div"); //UNQUIE
+	var smallerIcon2 = document.createElement("div"); //UNQUIE
+	var smallerIcon3 = document.createElement("div"); //UNQUIE
+
+	var deleteButton = document.createElement("button")
+	var editButton = document.createElement("button")
+
+	//IMPORTANT YOU MUST APPEND A ID WHICH HAS THE UNQUIE ID OF
+	//THE OPERATORS
+	//SO YOU KEEP THE CLASS, BUT THEN MAKE THE ID
+	//CHANGE THE BACKGROUND ID OF THE ICON
+	//YOU ALSO NEED ID FOR THE TEXT SO THAT YOU
+	//CAN USE THE INNER HTML
+	//LASTLY YOU SHOULD THEN MAKE SCRIPT THAT AUTO GENERATE THE CSS FOR ALL
+	//BACKGROUND ID PICTURES INTOT THE CSS. ACTUALLY
+	//SCRATCH THAT. INSTEAD JUST USE THE URL BUT PUT INTO THE HTML
+	//THAT THE MOST PROPER WAY TO DO IT. PUT THE PICTURE SRC INTOT THE
+	//HTML OF EACH DIV
+
+	opsContainer.className = "opsContainer";
+	OpsHeaderContainer.className = "OpsHeaderContainer";
+	icon.className = "icon"
+	name.className = "name"
+
+	info1.className = "info"
+	info2.className = "info"
+	info3.className = "info"
+
+	country.className = "country"
+	gadget.className = "gadget"
+	weapon.className = "weapon"
+
+	smallerIcon1.className = "smallerIcon"
+	smallerIcon2.className = "smallerIcon"
+	smallerIcon3.className = "smallerIcon"
+
+	displayContainer.appendChild(opsContainer)
+
+	opsContainer.appendChild(OpsHeaderContainer)
+	OpsHeaderContainer.appendChild(icon)
+
+	OpsHeaderContainer.appendChild(name)
+	name.innerHTML = opsClientInfo['name'] //opsClientInfo is information submit by the 'form'
+
+	opsContainer.appendChild(info1)
+	info1.appendChild(country)
+	country.innerHTML = opsClientInfo['country']
+	info1.appendChild(smallerIcon1)
+
+	opsContainer.appendChild(info2)
+	info2.appendChild(gadget)
+	gadget.innerHTML = opsClientInfo['gadget']
+	info2.appendChild(smallerIcon2)
+
+	opsContainer.appendChild(info3)
+	info3.appendChild(weapon)
+	weapon.innerHTML = opsClientInfo['weapon']
+	info3.appendChild(smallerIcon3)
+
+	opsContainer.appendChild(editButton)
+	editButton.innerHTML = "EDIT"
+
+	opsContainer.appendChild(deleteButton)
+	deleteButton.innerHTML = "DELETE"
+
 };
 
-//Read the Inputs when Submit
-bountySubmit.onclick = function(){
-	//This past this the current info to Server. Which mean when it writes
-	//it will get current one that the user submit.
-	bountyClientInfo = bountyInput1.value
-	createBounty(bountyClientInfo)
-	
+//////////////Read the Inputs and Modify////////////////
 
-	getBounty()
+//////////////Read the Inputs and Creates////////////////
 
-	//Empty and remove everything from the current bounty. MAKE SURE NOT PART
-	//of the INIT PROCESS
-	var bountyList = document.querySelector('#bountyList')
-	while (bountyList.firstChild){
-		bountyList.removeChild(bountyList.firstChild);
+
+getInput = function(){
+	opsClientInfo = {
+	"name": Input1.value,
+	"country": Input2.value,
+	"gadget": Input3.value,
+	"weapon": Input4.value,
+	"age": Input5.value
 	}
-
-
-	console.log('I got the new bounty list')
-
-	//make a loop function to write ALL the data from 
-	//reads from list_of_hits
-	setTimeout(function(){
-	for (i=0; i < list_of_hits.length; i++){
-		console.log(list_of_hits[i])
-		pinBountyPaper(list_of_hits[i])
-		console.log("building ", i)
-	}
-	}, 400);
-
-	//This statement below will be part of LOOP. 
-	//Going through Each of the Dictonry in the list
-	
-	console.log("All the Bounty Info: ",bountyClientInfo)
-
-	bountyInput1.value = ''
-
-	//once assign current Bounty for the single loop, pass it through the
-	//pinBountyPaper
-
-	//pinBountyPaper(bountyClientInfo)
+	console.log("All the Ops Info: ", opsClientInfo)
 }
 
-//FETCH GET
-var getBounty = function(name){
-fetch("http://localhost:8080/assassins").then(function (response) {
+Create.onclick = function(){
+	getInput()
+	createOps(opsClientInfo)
+	pinOpsPaper(opsClientInfo)
+}
+
+//////////////FETCH GET//////////////////
+
+var getOps = function(opsClientInfo){
+fetch("http://localhost:8080/operators").then(function (response) {
 	response.json().then(function(theData){
-	  	list_of_hits = theData;
+	  	list_of_ops = theData;
+
+		//UPDATE THE PAGE
+		refreshPage(list_of_ops)
   	});
 });
 };
 
-var createBounty = function(clientInfo) {
+//////////////Create the Operartors Display Box////////////////
 
-	var Data = 'name=' + encodeURIComponent(clientInfo);
+var createOps = function(opsClientInfo) {
 
-	fetch("http://localhost:8080/assassins",{
+	var Data = 'name=' + encodeURIComponent(opsClientInfo['name']) +
+		'&country=' + encodeURIComponent(opsClientInfo['country']) +
+		'&gadget=' + encodeURIComponent(opsClientInfo['gadget']) +
+		'&weapon=' + encodeURIComponent(opsClientInfo['weapon']) +
+		'&age=' + encodeURIComponent(opsClientInfo['age']);
+
+	fetch("http://localhost:8080/operators",{
 		method: "POST",
 		body: Data,
 		headers: {"content-type":"application/x-www-form-urlencoded"}
 	}).then(function (response) {
-		//NEVER EVER PUT JSON CODE HERE. IT CREATING and sending URLENCODED it not needed
 		console.log("Cool, you were able create something:", Data)
-			//Need to save the data to file?
+		//YOU SENDING THE DATA IS CREATING IT. AS LONG YOU HAVE FUNCTION THAT CREATE ELEMENTS 
+		//THIS WILL BE GOOD. YOU DON'T NEED PUT MUCH HERE, I THINK.
+		//
+		//UPDATE/REFRESH THE PAGE
   		});
 };
 
-//bountySubmit2.onclick = function(){
-//	createBounty('789456123456789')
-//}
+/////////////////REFRESH THE PAGE//////////////////////////////
+var refreshPage = function(list_of_ops){
+	deleteDisplay()
+	createDisplay(list_of_ops)
+}
 
-getBounty()
-
-setInterval(function(){
-    getBounty()
-    var bountyList = document.querySelector('#bountyList')
-	while (bountyList.firstChild){
-		bountyList.removeChild(bountyList.firstChild);
-	}
+var createDisplay = function(list_of_ops){
+	//Create the entire list
 	
-	
-	for (i=0; i < list_of_hits.length; i++){
-		console.log(list_of_hits[i])
-		pinBountyPaper(list_of_hits[i])
+	for (i=0; i < list_of_ops.length; i++){
+		console.log(list_of_ops[i])
+		pinOpsPaper(list_of_ops[i])
 		console.log("building ", i)
 	}
-}, 1000);
+	
+	console.log('All the entrys has been created')
+}
+
+var deleteDisplay = function(){
+	//Empty the entire list
+	var opsList = document.querySelector("#displayContainer")
+	while (opsList.firstChild){
+		opsList.removeChild(opsList.firstChild)
+	}
+	console.log('All the entrys has been deleted')
+}
+
+
+
+////////RUN ON PAGE LOAD////////////
+
+getOps()
+

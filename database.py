@@ -29,12 +29,20 @@ class operatorsDB():
         self.cursor.execute('SELECT * from operators WHERE id = ?', [operators_id])
         return self.cursor.fetchone()
 
+    def deleteOperators(self, operators_id):
+        self.cursor.execute('DELETE from operators WHERE id = ?', [operators_id])
+        return self.connection.commit()
+
     #Works
     def createOperators(self, name, country, gadget, weapon, age):
         self.cursor.execute("INSERT INTO operators (name, country, gadget, weapon, age) VALUES (?,?,?,?,?)", [name, country, gadget, weapon, age])
+        return self.connection.commit()
+
+    def modifyOperators(self, name, country, gadget, weapon, age):
+        self.cursor.execute("INSERT INTO operators (name, country, gadget, weapon, age) VALUES (?,?,?,?,?)", [name, country, gadget, weapon, age])
         self.connection.commit()
-
-
+        pass
+        #"UPDATE operators SET name = ?, country = ?, gadget = ?, weapon = ?, age = ? """WHERE id = ?""""
 
 
 
