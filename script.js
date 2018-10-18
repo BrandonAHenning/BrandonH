@@ -55,8 +55,6 @@ var pinOpsPaper = function(opsClientInfo) { //(Must be done through GET) <- SHOU
 	var smallerIcon2 = document.createElement("div"); //UNQUIE
 	var smallerIcon3 = document.createElement("div"); //UNQUIE
 
-	var deleteButton = document.createElement("button")
-	var editButton = document.createElement("button")
 
 	//IMPORTANT YOU MUST APPEND A ID WHICH HAS THE UNQUIE ID OF
 	//THE OPERATORS
@@ -110,15 +108,41 @@ var pinOpsPaper = function(opsClientInfo) { //(Must be done through GET) <- SHOU
 	weapon.innerHTML = opsClientInfo['weapon']
 	info3.appendChild(smallerIcon3)
 
-	opsContainer.appendChild(editButton)
-	editButton.innerHTML = "EDIT"
+	//IMPORTANT: THIS IS HOW MAKE EACH LIST HAVE BUTTON THAT SPECIFIC FOR THAT LIST.
+	var deleteButton = document.createElement("button")
+	var editButton = document.createElement("button")
 
-	opsContainer.appendChild(deleteButton)
+	editButton.innerHTML = "EDIT"
+	opsContainer.appendChild(editButton)
+
 	deleteButton.innerHTML = "DELETE"
+	opsContainer.appendChild(deleteButton)
+
+	deleteButton.onclick = function () {
+		deleteOps(opsClientInfo) //Send in the entire INFO, but at Delete Function you grab the ID
+	}
+
+	editButton.onclick = function() {
+		overrideOps(opsClientInfo)
+	}
+
+	//CREATE the pictures
+	//
+	//icon_path = createOpPics(opClientInfo['name'])
+	//
+	//icon.PUTINIMGwithPATH = icon_path
+	//
+	//FUNCTION
+	//
+	//icon_path = "/icon/default.png"
+	//
+	//for i in "list_of_opPics"
+	//	if name = list_of_opPics[i]
+	//		icon_path = list_of_opPics[i]
+	//
+	//return icon_path
 
 };
-
-//////////////Read the Inputs and Modify////////////////
 
 //////////////Read the Inputs and Creates////////////////
 
@@ -134,10 +158,21 @@ getInput = function(){
 	console.log("All the Ops Info: ", opsClientInfo)
 }
 
+
+resetInput = function(){
+
+	Input1.innerHTML = ""
+	Input2.innerHTML = ""
+	Input3.innerHTML = ""
+	Input4.innerHTML = ""
+	Input5.innerHTML = ""
+}
+
+
 Create.onclick = function(){
 	getInput()
 	createOps(opsClientInfo)
-	pinOpsPaper(opsClientInfo)
+	resetInput()
 }
 
 //////////////FETCH GET//////////////////
@@ -169,12 +204,72 @@ var createOps = function(opsClientInfo) {
 		headers: {"content-type":"application/x-www-form-urlencoded"}
 	}).then(function (response) {
 		console.log("Cool, you were able create something:", Data)
-		//YOU SENDING THE DATA IS CREATING IT. AS LONG YOU HAVE FUNCTION THAT CREATE ELEMENTS 
-		//THIS WILL BE GOOD. YOU DON'T NEED PUT MUCH HERE, I THINK.
-		//
-		//UPDATE/REFRESH THE PAGE
-  		});
+		//Refresh The page
+		getOps() //get all current info so once it refresh it up to date
+		refreshPage(list_of_ops)
+  	});
 };
+
+//////////////FETCH DELETE////////////////
+
+var deleteOps = function(opsClientInfo) {
+	if (confirm("You sure you want to delete " + opsClientInfo['name'] + "?")){
+		console.log("Deleting Ops with ID", opsClientInfo.id);
+		fetch(`http://localhost:8080/operators/${opsClientInfo.id}`
+			,{
+			method: "DELETE"
+		}).then(function () {
+			console.log("Cool, you were able delete the operartor")
+
+			//Refresh The page
+			getOps() //get all current info so once it refresh it up to date
+			refreshPage(list_of_ops)
+  		});
+		}
+	};
+
+//////////////////MODIFY & PUT///////////////////////////////
+
+//Before sending to editsOps, check current form to see the updated 
+var overrideOps = function(opsClientInfo) {
+	if (Input1.value != ""){
+		opsClientInfo['name'] = Input1.value}
+	if (Input2.value != ""){
+		opsClientInfo['country'] = Input2.value}
+	if (Input3.value != ""){
+		opsClientInfo['gadget'] = Input3.value}
+	if (Input4.value != ""){
+		opsClientInfo['weapon'] = Input4.value}
+	if (Input5.value != ""){
+		opsClientInfo['age'] = Input5.value}
+
+	editOps(opsClientInfo)
+}
+
+var editOps = function(opsClientInfo) {
+
+	var Data = 'name=' + encodeURIComponent(opsClientInfo['name']) +
+		'&country=' + encodeURIComponent(opsClientInfo['country']) +
+		'&gadget=' + encodeURIComponent(opsClientInfo['gadget']) +
+		'&weapon=' + encodeURIComponent(opsClientInfo['weapon']) +
+		'&age=' + encodeURIComponent(opsClientInfo['age']);
+
+	console.log("You are modify OPs with ID", opsClientInfo.id)
+
+	fetch(`http://localhost:8080/operators/${opsClientInfo.id}`
+		,{
+		method: "PUT",
+		body: Data,
+		headers: {"content-type":"application/x-www-form-urlencoded"}
+	}).then(function (response) {
+		console.log("Cool, you were able modify something:", Data)
+
+		//Refresh The page
+		getOps() //get all current info so once it refresh it up to date
+		refreshPage(list_of_ops)
+  	});
+}
+
 
 /////////////////REFRESH THE PAGE//////////////////////////////
 var refreshPage = function(list_of_ops){
