@@ -34,12 +34,12 @@ class operatorsDB():
         return self.connection.commit()
 
     #Works
-    def createOperators(self, name, country, gadget, weapon, age):
-        self.cursor.execute("INSERT INTO operators (name, country, gadget, weapon, age) VALUES (?,?,?,?,?)", [name, country, gadget, weapon, age])
+    def createOperators(self, name, country, side, weapon, age):
+        self.cursor.execute("INSERT INTO operators (name, country, side, weapon, age) VALUES (?,?,?,?,?)", [name, country, side, weapon, age])
         return self.connection.commit()
 
-    def modifyOperators(self, operators_id, name, country, gadget, weapon, age):
-        self.cursor.execute("UPDATE operators SET name = ?, country = ?, gadget = ?, weapon = ?, age = ? WHERE id = ?", [name, country, gadget, weapon, age, operators_id])
+    def modifyOperators(self, operators_id, name, country, side, weapon, age):
+        self.cursor.execute("UPDATE operators SET name = ?, country = ?, side = ?, weapon = ?, age = ? WHERE id = ?", [name, country, side, weapon, age, operators_id])
         return self.connection.commit()
 
 

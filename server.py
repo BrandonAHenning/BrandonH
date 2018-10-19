@@ -90,14 +90,14 @@ class MyHandler(BaseHTTPRequestHandler):
 
         name = data['name'][0]
         country  = data['country'][0]
-        gadget = data['gadget'][0]
+        side = data['side'][0]
         weapon = data['weapon'][0]
         age = data['age'][0]
 
         #Initlize/Create Database
         db = operatorsDB()
         print("The Ops is being Created")
-        db.createOperators(name, country, gadget, weapon, age)
+        db.createOperators(name, country, side, weapon, age)
 
     def handleOperators_RETRIVE(self, operators_id):
         db = operatorsDB()
@@ -158,14 +158,14 @@ class MyHandler(BaseHTTPRequestHandler):
 
             name = data['name'][0]
             country  = data['country'][0]
-            gadget = data['gadget'][0]
+            side = data['side'][0]
             weapon = data['weapon'][0]
             age = data['age'][0]
 
             #Initlize/Create Database
             db = operatorsDB()
             print("The Ops is being modify")
-            operators = db.modifyOperators(operators_id, name, country, gadget, weapon, age)
+            operators = db.modifyOperators(operators_id, name, country, side, weapon, age)
             
 
 

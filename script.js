@@ -40,7 +40,7 @@ var pinOpsPaper = function(opsClientInfo) { //(Must be done through GET) <- SHOU
 	var opsContainer = document.createElement("div");
 
 	var OpsHeaderContainer = document.createElement("div");
-	var icon = document.createElement("div"); //UNQUIE
+	var icon = document.createElement("img"); //UNQUIE
 	var name = document.createElement("h3"); //UNQUIE
 
 	var info1 = document.createElement("div");
@@ -48,7 +48,7 @@ var pinOpsPaper = function(opsClientInfo) { //(Must be done through GET) <- SHOU
 	var info3 = document.createElement("div");
 
 	var country = document.createElement("span"); //UNQUIE
-	var gadget = document.createElement("span"); //UNQUIE
+	var side = document.createElement("span"); //UNQUIE
 	var weapon = document.createElement("span"); //UNQUIE
 
 	var smallerIcon1 = document.createElement("div"); //UNQUIE
@@ -78,7 +78,7 @@ var pinOpsPaper = function(opsClientInfo) { //(Must be done through GET) <- SHOU
 	info3.className = "info"
 
 	country.className = "country"
-	gadget.className = "gadget"
+	side.className = "side"
 	weapon.className = "weapon"
 
 	smallerIcon1.className = "smallerIcon"
@@ -99,8 +99,8 @@ var pinOpsPaper = function(opsClientInfo) { //(Must be done through GET) <- SHOU
 	info1.appendChild(smallerIcon1)
 
 	opsContainer.appendChild(info2)
-	info2.appendChild(gadget)
-	gadget.innerHTML = opsClientInfo['gadget']
+	info2.appendChild(side)
+	side.innerHTML = opsClientInfo['side']
 	info2.appendChild(smallerIcon2)
 
 	opsContainer.appendChild(info3)
@@ -151,7 +151,7 @@ getInput = function(){
 	opsClientInfo = {
 	"name": Input1.value,
 	"country": Input2.value,
-	"gadget": Input3.value,
+	"side": Input3.value,
 	"weapon": Input4.value,
 	"age": Input5.value
 	}
@@ -194,7 +194,7 @@ var createOps = function(opsClientInfo) {
 
 	var Data = 'name=' + encodeURIComponent(opsClientInfo['name']) +
 		'&country=' + encodeURIComponent(opsClientInfo['country']) +
-		'&gadget=' + encodeURIComponent(opsClientInfo['gadget']) +
+		'&side=' + encodeURIComponent(opsClientInfo['side']) +
 		'&weapon=' + encodeURIComponent(opsClientInfo['weapon']) +
 		'&age=' + encodeURIComponent(opsClientInfo['age']);
 
@@ -237,7 +237,7 @@ var overrideOps = function(opsClientInfo) {
 	if (Input2.value != ""){
 		opsClientInfo['country'] = Input2.value}
 	if (Input3.value != ""){
-		opsClientInfo['gadget'] = Input3.value}
+		opsClientInfo['side'] = Input3.value}
 	if (Input4.value != ""){
 		opsClientInfo['weapon'] = Input4.value}
 	if (Input5.value != ""){
@@ -250,7 +250,7 @@ var editOps = function(opsClientInfo) {
 
 	var Data = 'name=' + encodeURIComponent(opsClientInfo['name']) +
 		'&country=' + encodeURIComponent(opsClientInfo['country']) +
-		'&gadget=' + encodeURIComponent(opsClientInfo['gadget']) +
+		'&side=' + encodeURIComponent(opsClientInfo['side']) +
 		'&weapon=' + encodeURIComponent(opsClientInfo['weapon']) +
 		'&age=' + encodeURIComponent(opsClientInfo['age']);
 
