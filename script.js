@@ -22,13 +22,9 @@ var opsList = document.querySelector('#opsList');
 
 
 var list_of_ops;
+var list_of_
 
 var opsClientInfo;
-
-//////////////Create the Operartors Display Box////////////////
-
-
-
 
 
 //////////////Create the Operartors Display Box////////////////
@@ -51,22 +47,9 @@ var pinOpsPaper = function(opsClientInfo) { //(Must be done through GET) <- SHOU
 	var side = document.createElement("span"); //UNQUIE
 	var weapon = document.createElement("span"); //UNQUIE
 
-	var smallerIcon1 = document.createElement("div"); //UNQUIE
-	var smallerIcon2 = document.createElement("div"); //UNQUIE
-	var smallerIcon3 = document.createElement("div"); //UNQUIE
-
-
-	//IMPORTANT YOU MUST APPEND A ID WHICH HAS THE UNQUIE ID OF
-	//THE OPERATORS
-	//SO YOU KEEP THE CLASS, BUT THEN MAKE THE ID
-	//CHANGE THE BACKGROUND ID OF THE ICON
-	//YOU ALSO NEED ID FOR THE TEXT SO THAT YOU
-	//CAN USE THE INNER HTML
-	//LASTLY YOU SHOULD THEN MAKE SCRIPT THAT AUTO GENERATE THE CSS FOR ALL
-	//BACKGROUND ID PICTURES INTOT THE CSS. ACTUALLY
-	//SCRATCH THAT. INSTEAD JUST USE THE URL BUT PUT INTO THE HTML
-	//THAT THE MOST PROPER WAY TO DO IT. PUT THE PICTURE SRC INTOT THE
-	//HTML OF EACH DIV
+	var smallerIcon1 = document.createElement("img"); //UNQUIE
+	var smallerIcon2 = document.createElement("img"); //UNQUIE
+	var smallerIcon3 = document.createElement("img"); //UNQUIE
 
 	opsContainer.className = "opsContainer";
 	OpsHeaderContainer.className = "OpsHeaderContainer";
@@ -91,21 +74,21 @@ var pinOpsPaper = function(opsClientInfo) { //(Must be done through GET) <- SHOU
 	OpsHeaderContainer.appendChild(icon)
 
 	OpsHeaderContainer.appendChild(name)
-	name.innerHTML = opsClientInfo['name'] //opsClientInfo is information submit by the 'form'
+	name.innerHTML = opsClientInfo['name'].charAt(0).toUpperCase() + opsClientInfo['name'].substr(1)
 
 	opsContainer.appendChild(info1)
 	info1.appendChild(country)
-	country.innerHTML = opsClientInfo['country']
+	country.innerHTML = opsClientInfo['country'].charAt(0).toUpperCase() + opsClientInfo['country'].substr(1)
 	info1.appendChild(smallerIcon1)
 
 	opsContainer.appendChild(info2)
 	info2.appendChild(side)
-	side.innerHTML = opsClientInfo['side']
+	side.innerHTML = opsClientInfo['side'].charAt(0).toUpperCase() + opsClientInfo['side'].substr(1)
 	info2.appendChild(smallerIcon2)
 
 	opsContainer.appendChild(info3)
 	info3.appendChild(weapon)
-	weapon.innerHTML = opsClientInfo['weapon']
+	weapon.innerHTML = opsClientInfo['weapon'].charAt(0).toUpperCase() + opsClientInfo['weapon'].substr(1)
 	info3.appendChild(smallerIcon3)
 
 	//IMPORTANT: THIS IS HOW MAKE EACH LIST HAVE BUTTON THAT SPECIFIC FOR THAT LIST.
@@ -126,23 +109,19 @@ var pinOpsPaper = function(opsClientInfo) { //(Must be done through GET) <- SHOU
 		overrideOps(opsClientInfo)
 	}
 
-	//CREATE the pictures
-	//
-	//icon_path = createOpPics(opClientInfo['name'])
-	//
-	//icon.PUTINIMGwithPATH = icon_path
-	//
-	//FUNCTION
-	//
-	//icon_path = "/icon/default.png"
-	//
-	//for i in "list_of_opPics"
-	//	if name = list_of_opPics[i]
-	//		icon_path = list_of_opPics[i]
-	//
-	//return icon_path
+	filepath1 = checkForOpsPics(opsClientInfo['name'])
+	icon.src = filepath1
 
+	filepath2 = checkForCountryPics(opsClientInfo['country'])
+	smallerIcon1.src = filepath2
+
+	filepath3 = checkForSidePics(opsClientInfo['side'])
+	smallerIcon2.src = filepath3
+
+	filepath4 = checkForWeaponPics(opsClientInfo['weapon'])
+	smallerIcon3.src = filepath4
 };
+
 
 //////////////Read the Inputs and Creates////////////////
 
@@ -283,7 +262,8 @@ var createDisplay = function(list_of_ops){
 	for (i=0; i < list_of_ops.length; i++){
 		console.log(list_of_ops[i])
 		pinOpsPaper(list_of_ops[i])
-		console.log("building ", i)
+		console.log(list_of_ops)
+		console.log("building ", list_of_ops[i])
 	}
 	
 	console.log('All the entrys has been created')
@@ -298,7 +278,116 @@ var deleteDisplay = function(){
 	console.log('All the entrys has been deleted')
 }
 
+///////////////////////CHECK FOR PICTURES/////////////////////////
 
+ops_pic = [
+	{name:"ash", filepath:"./ops_pic/ash.png"},
+	{name:"capitao", filepath:"./ops_pic/capitao.png"},
+	{name:"echo", filepath:"./ops_pic/echo.png"},
+	{name:"IQ", filepath:"./ops_pic/IQ.png"},
+	{name:"montage", filepath:"./ops_pic/montage.png"},
+	{name:"smoke", filepath:"./ops_pic/smoke.png"},
+	{name:"valkyrie", filepath:"./ops_pic/valkyrie.png"},
+	{name:"bandit", filepath:"./ops_pic/bandit.png"},
+	{name:"castle", filepath:"./ops_pic/castle.png"},
+	{name:"frost", filepath:"./ops_pic/frost.png"},
+	{name:"jager", filepath:"./ops_pic/jager.png"},
+	{name:"mute", filepath:"./ops_pic/mute.png"},
+	{name:"tachaka", filepath:"./ops_pic/tachaka.png"},
+	{name:"vigil", filepath:"./ops_pic/vigil.png"},
+	{name:"blackbeard", filepath:"./ops_pic/blackbeard.png"},
+	{name:"caveira", filepath:"./ops_pic/caveira.png"},
+	{name:"fuze", filepath:"./ops_pic/fuze.png"},
+	{name:"kapkan", filepath:"./ops_pic/kapkan.png"},
+	{name:"pulse", filepath:"./ops_pic/pulse.png"},
+	{name:"thatcher", filepath:"./ops_pic/thatcher.png"},
+	{name:"blitz", filepath:"./ops_pic/blitz.png"},
+	{name:"glaz", filepath:"./ops_pic/glaz.png"},
+	{name:"lesion", filepath:"./ops_pic/lesion.png"},
+	{name:"rook", filepath:"./ops_pic/rook.png"},
+	{name:"thermite", filepath:"./ops_pic/thermite.png"},
+	{name:"buck", filepath:"./ops_pic/buck.png"},
+	{name:"doc", filepath:"./ops_pic/doc.png"},
+	{name:"hibana", filepath:"./ops_pic/hibana.png"},
+	{name:"mira", filepath:"./ops_pic/mira.png"},
+	{name:"sledge", filepath:"./ops_pic/sledge.png"},
+	{name:"twitch", filepath:"./ops_pic/twitch.png"}
+]
+
+country_pic = [
+	{name:"america", filepath:"./country_pic/america.png"},
+	{name:"britan", filepath:"./country_pic/britan.png"},
+	{name:"china", filepath:"./country_pic/china.png"},
+	{name:"france", filepath:"./country_pic/france.png"},
+	{name:"italy", filepath:"./country_pic/italy.png"},
+	{name:"korea", filepath:"./country_pic/korea.png"},
+	{name:"russia", filepath:"./country_pic/russia.png"},
+	{name:"brazil", filepath:"./country_pic/brazil.png"},
+	{name:"canada", filepath:"./country_pic/canada.png"},
+	{name:"germany", filepath:"./country_pic/germany.png"},
+	{name:"japan", filepath:"./country_pic/japan.png"},
+	{name:"poland", filepath:"./country_pic/poland.png"},
+	{name:"spain", filepath:"./country_pic/spain.png"}
+]
+
+side_pic = [
+	{name:"attacking", filepath:"./side_pic/attacking.png"},
+	{name:"defending", filepath:"./side_pic/defending.png"}
+]
+
+
+weapon_pic = [
+	{name:"sniper", filepath:"./weapon_pic/sniper.png"},
+	{name:"rifle", filepath:"./weapon_pic/rifle.png"},
+	{name:"pistol", filepath:"./weapon_pic/pistol.png"}
+]
+
+var checkForOpsPics = function(name){
+	filepath = "./ops_pic/default.png"
+	name = name.toLowerCase()
+
+	for (x=0; x < ops_pic.length; x++){
+		console.log("I made loop this amount of time: ", x)
+		if (name == ops_pic[x]['name']){
+			filepath = ops_pic[x]['filepath']
+		}
+	}
+	return filepath
+}
+
+var checkForCountryPics = function(country){
+	filepath = "./country_pic/default.png"
+	country = country.toLowerCase()
+
+	for (w=0; w < country_pic.length; w++){
+		if (country == country_pic[w]['name']){
+			filepath = country_pic[w]['filepath']}
+	}
+
+	return filepath
+}
+
+var checkForSidePics = function(side){
+	filepath = "./side_pic/default.png"
+	side = side.toLowerCase()
+
+	for (q=0; q < side_pic.length; q++){
+		if (side == side_pic[q]['name']){
+			filepath = side_pic[q]['filepath']}
+	}
+	return filepath
+}
+
+var checkForWeaponPics = function(weapon){
+	filepath = "./weapon_pic/default.png"
+	weapon = weapon.toLowerCase()
+	for (a=0; a < weapon_pic.length; a++){
+		if (weapon == weapon_pic[a]['name']){
+			filepath = weapon_pic[a]['filepath']}
+	}
+
+	return filepath
+}
 
 ////////RUN ON PAGE LOAD////////////
 
