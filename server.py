@@ -2,6 +2,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import parse_qs
 import json
 from database import operatorsDB
+from passlib.hash import bcrypt
 
 class MyHandler(BaseHTTPRequestHandler):
 
@@ -168,8 +169,49 @@ class MyHandler(BaseHTTPRequestHandler):
             print("The Ops is being modify")
             operators = db.modifyOperators(operators_id, name, country, side, weapon, age)
             
+    def registerUser(self, username):
+
+        ##############This will be it own function. It will be in do_CREATE, do_GET or LoginUser? 
+        ####You need to check just the username again and then password for Login. If/then if 
+        db = operatorsDB()
+        check = db.checkUsername(username)
+        if check == None:
+            return True #There is no Email with that, you can go on.
+        else:
+            return False #404, it exists. Send the warning message.
+         ##############
+        
 
 
+        #Where this function will really start
+        self.send_response(201)
+        self.send_header('Access-Control-Allow-Origin', '*')
+        length = self.headers["content-length"]
+        body = self.rfile.read(int(length)).decode("utf-8")
+
+        data = parse_qs(body) #Parse it as a dictonary
+
+        username = data['username'][0]
+        first_name = data['first_name'][0]
+        last_name = data['last_name'][0]
+        password  = data['password'][0]
+
+        #Take the password, salt it, and assign it as new password
+        bytes_password = password.encode()
+        hash_password = bcrypt.hashpw(bytes_password, bcrypt.gensalt() )
+
+        #Initlize/Create Database and send put in the database
+        db = operatorsDB()
+        operators = db.registerUser(username, first_name, last_name, hash_password)
+
+    def loginUser(self, username, password)
+
+        #Take the password, salt it, and assign it as new password
+        bytes_password = password.encode()
+        hash_password = bcrypt.hashpw(bytes_password, bcrypt.gensalt() )
+
+        db = operatorsDB()
+        check = db.loginUser(username, hash_password)
 
 def run():
     listen = ('0.000', 8080)

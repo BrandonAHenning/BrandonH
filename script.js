@@ -18,6 +18,13 @@ console.log("Input5 ", Input5);
 
 Create = document.querySelector('#Create')
 
+reg_Input1 = document.querySelector("#reg_Input1");
+reg_Input2 = document.querySelector("#reg_Input2");
+reg_Input3 = document.querySelector("#reg_Input3");
+reg_Input4 = document.querySelector("#reg_Input4");
+
+login_Input1 = document.querySelector("#login_Input1");
+login_Input2 = document.querySelector("#login_Input2");
 
 
 var opsList = document.querySelector('#opsList');
@@ -56,6 +63,47 @@ function openTab(evt, name ) {
 	console.log("It ends")
 }
 
+/////////////////////REGISTER A USER////////////////////////////
+
+
+
+
+
+
+
+
+////////////////////WARNING MESSAGE FOR FORMS//////////////////
+
+var warning_message = function(message, form){
+	var warningContainer = document.querySelector(".warningContainer_" + form)
+	console.log(warningContainer)
+	var warning_message = document.createElement("p");
+	var line_break = document.createElement("br");
+	warning_message.className = "warning"
+	warning_message.innerHTML = message
+	warningContainer.appendChild(warning_message)
+	warningContainer.appendChild(line_break)
+	warningContainer.appendChild(line_break)
+}
+
+var form_fail = function(error, form){ //form = [NAME] Make sure it string
+	if (error == "register"){
+		message = "That email address already exists, try another."}
+	else if (error == "login"){
+		message = "Your username or password is wrong, try again."}
+	else
+		{message = "GENERIC ERROR, INVESTAGE"}
+
+	warning_message(message, form)
+}
+
+var delete_warning = function(form){ //form = [name] MAKE SURE IT STRING
+	var warningContainer = document.querySelector(".warningContainer_" + form)
+        while (warningContainer.firstChild){
+                warningContainer.removeChild(warningContainer.firstChild)
+        }
+
+}
 
 //////////////Create the Operartors Display Box////////////////
 
@@ -136,12 +184,14 @@ var pinOpsPaper = function(opsClientInfo) { //(Must be done through GET) <- SHOU
 	}
 
 	editButton.onclick = function() {
-		Input1.value = opsClientInfo['name']
-		Input2.value = opsClientInfo['country']
-		Input3.value = opsClientInfo['side']
-		Input4.value = opsClientInfo['weapon']
-		Input5.value = opsClientInfo['age']
-		edit_mode = true	
+		//Input1.value = opsClientInfo['name']
+		//Input2.value = opsClientInfo['country']
+		//Input3.value = opsClientInfo['side']
+		//Input4.value = opsClientInfo['weapon']
+		//Input5.value = opsClientInfo['age']
+		//edit_mode = true	
+		console.log("passing in OP info", opsClientInfo)
+		overrideOps(opsClientInfo)
 	}
 
 	filepath1 = checkForOpsPics(opsClientInfo['name'])
@@ -186,10 +236,12 @@ resetInput = function(){
 
 Create.onclick = function(){
 	the_input = getInput()
-	if (edit_mode == true) { //NEED TO RETRIVE THE ID OTHERWISE IT CAn'T DO ANYTHING. LOOK AT DELETE
-		overrideOps(the_input)}
-	else {
-		createOps(the_input)}
+	//if (edit_mode == true) { //NEED TO RETRIVE THE ID OTHERWISE IT CAn'T DO ANYTHING. LOOK AT DELETE
+	//	overrideOps(the_input)
+	//}
+	//else {
+	createOps(the_input)
+	//}
 	resetInput()
 }
 
@@ -251,11 +303,16 @@ var deleteOps = function(opsClientInfo) {
 //Before sending to editsOps, check current form to see the updated 
 var overrideOps = function(opsClientInfo) {
 
-        opsClientInfo['name'] = Input1.value
-        opsClientInfo['country'] = Input2.value
-        opsClientInfo['side'] = Input3.value
-        opsClientInfo['weapon'] = Input4.value
-        opsClientInfo['age'] = Input5.value
+	if (Input1.value != ""){
+		opsClientInfo['name'] = Input1.value} 
+	if (Input2.value != ""){
+		opsClientInfo['country'] = Input2.value} 
+	if (Input3.value != ""){
+		opsClientInfo['side'] = Input3.value} 
+	if (Input4.value != ""){
+		opsClientInfo['weapon'] = Input4.value} 
+	if (Input5.value != ""){
+		opsClientInfo['age'] = Input5.value} 
 
 	editOps(opsClientInfo)
 }

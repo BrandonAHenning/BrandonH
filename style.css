@@ -77,6 +77,19 @@ body{
 	display:none;
 }
 
+.warning{
+	color:red;
+	font-weight:bold;
+	text-align:center;
+	animation: fadeEffect 1s;
+}
+
+/*opacity animation*/
+@keyframes fadeEffect {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+
 #FormContainer h2, #FormContainer_Register h2, #FormContainer_Login h2{
 	margin:0 auto 10px auto;
 	text-align: center;
