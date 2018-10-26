@@ -16,15 +16,45 @@ console.log("Input4 ", Input4);
 Input5 = document.querySelector("#Input5");
 console.log("Input5 ", Input5);
 
+Create = document.querySelector('#Create')
+
 
 
 var opsList = document.querySelector('#opsList');
 
 
 var list_of_ops;
-var list_of_
-
+var edit_mode = false;
 var opsClientInfo;
+
+//////////////////////////OPEN TABS////////////////////////////
+function openTab(evt, name ) {
+	// Declare all variables
+	var i, tabContent, tab;
+
+	// Get all elements with class="tabContent" and hide them
+	// QUERY SELECTOR DOESN'T WORK FOR BELOW, but yet GETELEMENTBYCLASS DOES???
+	tabContent = document.getElementsByClassName("tabContent");
+	for (i = 0; i < tabContent.length; i++) {
+		console.log("loop")
+		tabContent[i].style.display = "none";
+	}
+
+	// Get all elements with class="tab" and remove the class "active"
+	tab = document.getElementsByClassName(".tab");
+	for (i = 0; i < tab.length; i++) {
+		tab[i].className = tab[i].className.replace(" active", "");
+		console.log("loop2 ", [i])
+	}
+
+	// Show the current tab, and add an "active" class to the button that opened the tab
+	document.getElementById(name).style.display = "block";
+	evt.currentTarget.className += " active";
+
+
+
+	console.log("It ends")
+}
 
 
 //////////////Create the Operartors Display Box////////////////
@@ -106,7 +136,12 @@ var pinOpsPaper = function(opsClientInfo) { //(Must be done through GET) <- SHOU
 	}
 
 	editButton.onclick = function() {
-		overrideOps(opsClientInfo)
+		Input1.value = opsClientInfo['name']
+		Input2.value = opsClientInfo['country']
+		Input3.value = opsClientInfo['side']
+		Input4.value = opsClientInfo['weapon']
+		Input5.value = opsClientInfo['age']
+		edit_mode = true	
 	}
 
 	filepath1 = checkForOpsPics(opsClientInfo['name'])
@@ -135,6 +170,7 @@ getInput = function(){
 	"age": Input5.value
 	}
 	console.log("All the Ops Info: ", opsClientInfo)
+	return opsClientInfo
 }
 
 
@@ -149,8 +185,11 @@ resetInput = function(){
 
 
 Create.onclick = function(){
-	getInput()
-	createOps(opsClientInfo)
+	the_input = getInput()
+	if (edit_mode == true) { //NEED TO RETRIVE THE ID OTHERWISE IT CAn'T DO ANYTHING. LOOK AT DELETE
+		overrideOps(the_input)}
+	else {
+		createOps(the_input)}
 	resetInput()
 }
 
@@ -211,16 +250,12 @@ var deleteOps = function(opsClientInfo) {
 
 //Before sending to editsOps, check current form to see the updated 
 var overrideOps = function(opsClientInfo) {
-	if (Input1.value != ""){
-		opsClientInfo['name'] = Input1.value}
-	if (Input2.value != ""){
-		opsClientInfo['country'] = Input2.value}
-	if (Input3.value != ""){
-		opsClientInfo['side'] = Input3.value}
-	if (Input4.value != ""){
-		opsClientInfo['weapon'] = Input4.value}
-	if (Input5.value != ""){
-		opsClientInfo['age'] = Input5.value}
+
+        opsClientInfo['name'] = Input1.value
+        opsClientInfo['country'] = Input2.value
+        opsClientInfo['side'] = Input3.value
+        opsClientInfo['weapon'] = Input4.value
+        opsClientInfo['age'] = Input5.value
 
 	editOps(opsClientInfo)
 }
@@ -390,6 +425,6 @@ var checkForWeaponPics = function(weapon){
 }
 
 ////////RUN ON PAGE LOAD////////////
-
+document.querySelectorAll(".tab")[2].click();
 getOps()
 

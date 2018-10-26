@@ -43,34 +43,69 @@ body{
 	margin:0;
 	float:left;
 }
-#FormContainer h2{
+
+#tabContainer{
+	background-color:red;
+	background-color:#292c33;
+	width:auto;
+	height:20px;
+	border:2px solid #ccc;
+	text-align: center;
+}
+
+.tab{
+	width:calc(100%/3);
+	color:#ccc;
+	height:20px;
+	float:left;
+	background-color:#292c33;
+	border:none;
+	outline:none;
+	cursor:pointer;
+}
+
+.tab:nth-child(2){
+	border-right:1px solid #ccc;
+	border-left:1px solid #ccc;
+}
+
+.tab:hover{
+	color:#fff;
+}
+
+.tabContent{
+	display:none;
+}
+
+#FormContainer h2, #FormContainer_Register h2, #FormContainer_Login h2{
 	margin:0 auto 10px auto;
 	text-align: center;
 	color:#ccc;
 	padding:0;
 }
-#FormContainer{
+#FormContainer, #FormContainer_Register, #FormContainer_Login{
 	background-color:#292c33;
 	margin:180px 0;
 	padding:0px 0;
 	border:2px solid #ccc;
 }
 
-#FormContainer input{
+#FormContainer input,#FormContainer_Register input, #FormContainer_Login input{
 	background-color:#1a1d22;
 	border:2px solid #ccc;
 	margin:0 0 10px 40px;
 	color:#ccc;
 }
 
-#FormContainer button{
+#FormContainer button, #FormContainer_Register button, #FormContainer_Login button{
 	background-color:#1a1d22;
 	border:2px solid #ccc;
 	margin:0 0 20px 90px ;
 	color:#ccc;
+	cursor:pointer;
 }
 
-#FormContainer input::placeholder{
+#FormContainer input::placeholder, #FormContainer_Register input::placeholder, #FormContainer_Login input::placeholder{
 	color:#666;
 }
 
@@ -101,6 +136,7 @@ body{
 	border:2px solid #ccc;
 	margin:0 10px;
 	color:#ccc;
+	cursor:pointer;
 }
 .opsContainer button:first-of-type{
 	margin:0 0 0 85px;

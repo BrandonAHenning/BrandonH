@@ -42,6 +42,15 @@ class operatorsDB():
         self.cursor.execute("UPDATE operators SET name = ?, country = ?, side = ?, weapon = ?, age = ? WHERE id = ?", [name, country, side, weapon, age, operators_id])
         return self.connection.commit()
 
+    def checkUsername(self, username):
+        pass
+
+    def registerUser(self, username, first_name, last_name, password):
+        pass
+
+    def loginUser(self, username, password):
+        pass
+
 
 
 

@@ -9,15 +9,47 @@
 
 			<div id="submitContainer">
 				<div id="InputContainer">
-					<div id="FormContainer">
-					<h2>Form</h2>
-					<input id="Input1" placeholder="Name"></input></br>
-					<input id="Input2" placeholder="Country"></input></br>
-					<input id="Input3" placeholder="Side"></input></br>
-					<input id="Input4" placeholder="Weapon"></input></br>
-					<input id="Input5" placeholder="Age"></input></br>
-					</br>
-					<button id="Create">Submit</button>
+					<!----------Tab Containers-------------->
+					<div id="tabContainer">
+						<button class="tab" onclick="openTab(event,'FormContainer_Register')">Register</button>
+						<button class="tab" onclick="openTab(event,'FormContainer_Login')">Login</button>
+						<button class="tab" onclick="openTab(event,'FormContainer')">Service</button>
+					</div>
+
+					<!----------Tab Contents-------------->
+					<div id="FormContainer" class="tabContent">
+						<h2>Form</h2>
+						<input id="Input1" placeholder="Name"></input></br>
+						<input id="Input2" placeholder="Country"></input></br>
+						<input id="Input3" placeholder="Side"></input></br>
+						<input id="Input4" placeholder="Weapon"></input></br>
+						<input id="Input5" placeholder="Age"></input></br>
+						</br>
+						<button id="Create">Submit</button>
+					</div>
+
+					<div id="FormContainer_Register" class="tabContent">
+						<h2>Register</h2>
+						<input id="reg_Input1" placeholder="Email"></input></br>
+						<input id="reg_Input2" placeholder="First Name"></input></br>
+						<input id="reg_Input3" placeholder="Last Name"></input></br>
+						<input id="reg_Input4" placeholder="Password"></input></br>
+						</br>
+						<span>That email address already exists, try another.</span>
+						</br>
+						</br>
+						<button id="Create">Submit</button>
+					</div>
+
+					<div id="FormContainer_Login" class="tabContent">
+						<h2>Login</h2>
+						<input id="login_Input1" placeholder="Email"></input></br>
+						<input id="login_Input2" placeholder="Password"></input></br>
+						</br>
+						<span>Your username or password is wrong. Try again.</span>
+						</br>
+						</br>
+						<button id="Create">Submit</button>
 					</div>
 				</div>
 				</div>

@@ -64,7 +64,7 @@ class MyHandler(BaseHTTPRequestHandler):
 
 
     def handleOperators_LIST(self):
-        self.send_response(201)
+        self.send_response(200)
         self.send_header("content-type", "application/json")
         self.send_header('Access-Control-Allow-Origin', '*')
         self.end_headers()
@@ -104,13 +104,14 @@ class MyHandler(BaseHTTPRequestHandler):
         op_check = db.retriveOperators(operators_id)
 
         if op_check is None:
-            print("IT IS NONE")
+            print("IT IS NONE for RETRIVE")
             self.handleNotFound()
         else:
             self.send_response(200)
             self.send_header("content-type", "application/json")
             self.send_header('Access-Control-Allow-Origin', '*')
             self.end_headers()
+            print("IT PAST for RETRIVE opcheck")
 
             #Initlize/Create Database
             db = operatorsDB()
@@ -144,7 +145,7 @@ class MyHandler(BaseHTTPRequestHandler):
         op_check = db.retriveOperators(operators_id)
 
         if op_check is None:
-            print("IT IS NONE")
+            print("IT IS NONE for PUT")
             self.handleNotFound()
         else:
             self.send_response(201)
