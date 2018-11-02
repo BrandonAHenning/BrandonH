@@ -38,10 +38,8 @@ class MyHandler(BaseHTTPRequestHandler):
         elif self.path == "/sessions":
             self.loginUser()
         #REGISTER
-        elif self.path.startswith("/users"):
-            user_path = self.path.split("/")
-            username = user_path[2]
-            self.registerUser(username)
+        elif self.path == "/users":
+            self.registerUser()
         #404
         else:
             self.handleNotFound()
@@ -177,8 +175,18 @@ class MyHandler(BaseHTTPRequestHandler):
             print("The Ops is being modify")
             operators = db.modifyOperators(operators_id, name, country, side, weapon, age)
             
-    def registerUser(self, username):
+    def registerUser(self):
+        length = self.headers["content-length"]
+        body = self.rfile.read(int(length)).decode("utf-8")
+
+        data = parse_qs(body) #Parse it as a dictonary
         db = operatorsDB()
+
+        username = data['email'][0] #EMAIL =/= USERNAME, but I have to use it cause of database
+        first_name = data['first_name'][0]
+        last_name = data['last_name'][0]
+        password  = data['password'][0]
+
         check = db.checkUsername(username)
         if check != None:
             self.handleNotFound()
@@ -186,16 +194,7 @@ class MyHandler(BaseHTTPRequestHandler):
         else:
             self.send_response(201)
             self.send_header('Access-Control-Allow-Origin', '*')
-            length = self.headers["content-length"]
-            body = self.rfile.read(int(length)).decode("utf-8")
             self.end_headers()
-
-            data = parse_qs(body) #Parse it as a dictonary
-
-            username = data['email'][0] #EMAIL =/= USERNAME, but I have to use it cause of database
-            first_name = data['first_name'][0]
-            last_name = data['last_name'][0]
-            password  = data['password'][0]
 
             #Take the password, salt it, and assign it as new password
             bytes_password = password.encode()
@@ -213,26 +212,20 @@ class MyHandler(BaseHTTPRequestHandler):
         data = parse_qs(body) #Parse it as a dictonary
         username = data['email'][0]
         password = data['password'][0] 
-        print("user: ", username, "password: ", password)
 
         db = operatorsDB()
         check = db.checkUsername(username)
+
         print("check is: ", check)
         if check == None:
             self.handleNotFound()
             print("Username/Password Is Not Wrong 1")
         else:
-            bytes_password = password.encode()
-            hash_password = bcrypt.hashpw(bytes_password, bcrypt.gensalt() )
-            check = db.checkPassword(username, hash_password) #return as Dict of all atrbites
-            print(check["hash_password"])
+            #Grab password from database, it is bytes
+            check_password = check['hash_password']
 
-            bcrypt.checkpw(bytes_password, check['hash_password']) #you look in dic of check_password
-
-            #Why would I need Bcrypt.Checkpw when I could just hash the password and 
-            #check it through the database to see it match? ? = username, ? = password
-
-            print("2nd phrase of check is:", check)
+            #Comapre the given password and hashpassword. They both are in bytes. Not UTF-8
+            check = bcrypt.checkpw(password.encode(), check_password)
 
             if check == False:
                 self.handleNotFound()

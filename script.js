@@ -63,49 +63,49 @@ function openTab(evt, name ) {
 	console.log("It ends")
 }
 
-/////////////////////REGISTER A USER////////////////////////////
-
-
-
-
-
-
-
-
-////////////////////WARNING MESSAGE FOR FORMS//////////////////
-
-
-
 
 //MAKE A MESSAGE WHENEVER THEY SUCCESFFUL CREATE A ACCOUNT also reset the inputs
 
-var warning_message = function(message, form){
-	var warningContainer = document.querySelector(".warningContainer_" + form)
-	console.log(warningContainer)
-	var warning_message = document.createElement("p");
+var action_message = function(message, form, state){
+	var messageContainer = document.querySelector(".messageContainer_" + form)
+	var action_message = document.createElement("p");
 	var line_break = document.createElement("br");
-	warning_message.className = "warning"
-	warning_message.innerHTML = message
-	warningContainer.appendChild(warning_message)
-	warningContainer.appendChild(line_break)
-	warningContainer.appendChild(line_break)
+
+	if (state == false)
+		{action_message.className = "warning"}
+	else
+		{action_message.className = "successful"}
+
+	action_message.innerHTML = message
+	messageContainer.appendChild(action_message)
+	messageContainer.appendChild(line_break)
+	messageContainer.appendChild(line_break)
 }
 
-var form_fail = function(error, form){ //form = [NAME] Make sure it string
-	if (error == "register"){
+var form_action = function(error, form, state){ //form = [NAME] Make sure it string
+	delete_warning(form)
+	if (error == "fail_register"){
 		message = "That email address already exists, try another."}
-	else if (error == "login"){
+	else if (error == "success_register"){
+		message = "Your register has been successful"}
+
+	else if (error == "fail_login"){
 		message = "Your username or password is wrong, try again."}
+	else if (error == "success_login"){
+		message = "You have login!"}
+
+	else if (error == "invaild"){
+		message = "You need to fill out the entire form"}
 	else
 		{message = "GENERIC ERROR, INVESTAGE"}
 
-	warning_message(message, form)
+	action_message(message, form, state)
 }
 
 var delete_warning = function(form){ //form = [name] MAKE SURE IT STRING
-	var warningContainer = document.querySelector(".warningContainer_" + form)
-        while (warningContainer.firstChild){
-                warningContainer.removeChild(warningContainer.firstChild)
+	var messageContainer = document.querySelector(".messageContainer_" + form)
+        while (messageContainer.firstChild){
+                messageContainer.removeChild(messageContainer.firstChild)
         }
 
 }
@@ -267,8 +267,13 @@ Create.onclick = function(){
 
 reg_Create.onclick = function(){
 	the_input = register_getInput()
-	registerClient(the_input) //CHANGE FUNCTION
-	resetInput()
+
+	if (the_input.email == "" || the_input.first_name == "" || the_input.last_name == "" || the_input.password == "")
+		{form_action("invaild", "register", false)
+		resetInput()}
+	else
+		{registerClient(the_input) //CHANGE FUNCTION
+		resetInput()}
 }
 
 login_Create.onclick = function(){
@@ -321,24 +326,24 @@ var registerClient = function(registerClientInfo) {
 		'&last_name=' + encodeURIComponent(registerClientInfo['last_name']) +
 		'&password=' + encodeURIComponent(registerClientInfo['password']);
 
-	fetch(`http://localhost:8080/users/${registerClientInfo.email}`
+	fetch(`http://localhost:8080/users`
 		,{
 		method: "POST",
 		body: Data,
 		headers: {"content-type":"application/x-www-form-urlencoded"}
 	}).then(function (response) {
-		if (response.status == 404) {
-			console.log("404 status response, register")
-			//NOT PERFORM ERROR ON CLIENT WHEN GET 404?
-			//Function work if succesful, but if 404 it doesn't perfrom function
-			form_fail("register", "register")}
-		else
-			{console.log("You create an account", Data)}
+		console.log("You create an account", Data)
+
+		delete_warning("register")
+		form_action("success_register", "register", true)
 
 		//Refresh The page
 		getOps() //get all current info so once it refresh it up to date
 		refreshPage(list_of_ops)
-  	});
+  	}).catch(function(){
+		delete_warning("register")
+		form_action("fail_register", "register", false)
+	});
 };
 
 //////////////////////LOGIN THE USER////////////////////////////
@@ -354,17 +359,18 @@ var loginClient = function(loginClientInfo) {
 		body: Data,
 		headers: {"content-type":"application/x-www-form-urlencoded"}
 	}).then(function (response) {
-		if (response.status == 404) {
-			//NOT PERFORM ERROR ON CLIENT WHEN GET 404?
-			//Function work if succesful, but if 404 it doesn't perfrom function
-			form_fail("login", "login")}
-		else
-			{console.log("You login", Data)}
+		console.log("You login", Data)
+
+		delete_warning("login")
+		form_action("success_login", "login", true)
 
 		//Refresh The page
 		getOps() //get all current info so once it refresh it up to date
 		refreshPage(list_of_ops)
-  	});
+  	}).catch(function(){	
+		delete_warning("login")
+		form_action("fail_login", "login", false)
+	});
 };
 
 //////////////FETCH DELETE////////////////

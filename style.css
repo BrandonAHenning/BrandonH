@@ -84,6 +84,13 @@ body{
 	animation: fadeEffect 1s;
 }
 
+.successful{
+	color:green;
+	font-weight:bold;
+	text-align:center;
+	animation: fadeEffect 1s;
+}
+
 /*opacity animation*/
 @keyframes fadeEffect {
     from {opacity: 0;}
