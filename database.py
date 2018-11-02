@@ -46,9 +46,13 @@ class operatorsDB():
         self.cursor.execute("SELECT * FROM users WHERE username= ?", [username])
         return self.cursor.fetchone()
 
+    def checkPassword(self,username, hash_password):
+        self.cursor.execute("SELECT * FROM users WHERE username = ? AND hash_password= ?", [username, hash_password])
+        return self.cursor.fetchone()
+
     def registerUser(self, username, first_name, last_name, hash_password):
-        self.cursor.execute("INSERT INTO users (username, first_name, last_name, hash_password) VALUES (?,?,?,?)", [username, first_name, last_name, hash_password))
-        return self.conncetion.commit()
+        self.cursor.execute("INSERT INTO users (username, first_name, last_name, hash_password) VALUES (?,?,?,?)", [username, first_name, last_name, hash_password])
+        return self.connection.commit()
 
     def loginUser(self, username, hash_password):
         self.cursor.execute("SELECT * FROM users WHERE username= ? AND hash_password = ?", [username, hash_password])

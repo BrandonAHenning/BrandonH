@@ -3,6 +3,7 @@ from urllib.parse import parse_qs
 import json
 from database import operatorsDB
 from passlib.hash import bcrypt
+import bcrypt
 
 class MyHandler(BaseHTTPRequestHandler):
 
@@ -33,6 +34,14 @@ class MyHandler(BaseHTTPRequestHandler):
         #POST
         if self.path == "/operators":
             self.handleOperators_CREATE()
+        #SESSIONS
+        elif self.path == "/sessions":
+            self.loginUser()
+        #REGISTER
+        elif self.path.startswith("/users"):
+            user_path = self.path.split("/")
+            username = user_path[2]
+            self.registerUser(username)
         #404
         else:
             self.handleNotFound()
@@ -141,7 +150,6 @@ class MyHandler(BaseHTTPRequestHandler):
             print(operators_id + "Operators ID has been deleted from the database")
 
     def handleOperators_PUT(self, operators_id):
-        print("I made it to the PUT function")
         db = operatorsDB()
         op_check = db.retriveOperators(operators_id)
 
@@ -170,48 +178,65 @@ class MyHandler(BaseHTTPRequestHandler):
             operators = db.modifyOperators(operators_id, name, country, side, weapon, age)
             
     def registerUser(self, username):
+        db = operatorsDB()
+        check = db.checkUsername(username)
+        if check != None:
+            self.handleNotFound()
+            print("404 is beinng trigger because a user is already in database for register")
+        else:
+            self.send_response(201)
+            self.send_header('Access-Control-Allow-Origin', '*')
+            length = self.headers["content-length"]
+            body = self.rfile.read(int(length)).decode("utf-8")
+            self.end_headers()
 
-        ##############This will be it own function. It will be in do_CREATE, do_GET or LoginUser? 
-        ####You need to check just the username again and then password for Login. If/then if 
+            data = parse_qs(body) #Parse it as a dictonary
+
+            username = data['email'][0] #EMAIL =/= USERNAME, but I have to use it cause of database
+            first_name = data['first_name'][0]
+            last_name = data['last_name'][0]
+            password  = data['password'][0]
+
+            #Take the password, salt it, and assign it as new password
+            bytes_password = password.encode()
+            hash_password = bcrypt.hashpw(bytes_password, bcrypt.gensalt() )
+            print("hasing the password", hash_password)
+
+            #Initlize/Create Database and send put in the database
+            db = operatorsDB()
+            operators = db.registerUser(username, first_name, last_name, hash_password)
+            print(username, " has been succesfully register")
+
+    def loginUser(self, username, password):
         db = operatorsDB()
         check = db.checkUsername(username)
         if check == None:
-            return True #There is no Email with that, you can go on.
+            self.handleNotFound()
+            print("Username/Password Is Not Wrong")
         else:
-            return False #404, it exists. Send the warning message.
-         ##############
-        
+            bytes_password = password.encode()
+            hash_password = bcrypt.hashpw(bytes_password, bcrypt.gensalt() )
+            #DO YOU GRAB THE USERNAME AND PASSWORD
+            #OR MAYBE YOU GRAB PASSWORD AND VERIFY IT
+            #IS IT TRUE THEY GRAB THEY CAN GRAB ANY USErNAME OR PASSWORD FROM DB THOUGH?
+            bcrypt.verify()
+            check = db.checkPassword(username, hash_password)
+            if check == None:
+                self.handleNotFound()
+                print("Username/Password Is Not Wrong")
+            else:
+                self.send_response(201)
+                self.send_header('Access-Control-Allow-Origin', '*')
+                length = self.headers["content-length"]
+                body = self.rfile.read(int(length)).decode("utf-8")
+                self.end_headers()
+
+                data = parse_qs(body) #Parse it as a dictonary
+
+                username = data['email'][0]
+                password = data['hash_password'][0] #MIGHT BE A PROBLEM??
 
 
-        #Where this function will really start
-        self.send_response(201)
-        self.send_header('Access-Control-Allow-Origin', '*')
-        length = self.headers["content-length"]
-        body = self.rfile.read(int(length)).decode("utf-8")
-
-        data = parse_qs(body) #Parse it as a dictonary
-
-        username = data['username'][0]
-        first_name = data['first_name'][0]
-        last_name = data['last_name'][0]
-        password  = data['password'][0]
-
-        #Take the password, salt it, and assign it as new password
-        bytes_password = password.encode()
-        hash_password = bcrypt.hashpw(bytes_password, bcrypt.gensalt() )
-
-        #Initlize/Create Database and send put in the database
-        db = operatorsDB()
-        operators = db.registerUser(username, first_name, last_name, hash_password)
-
-    def loginUser(self, username, password)
-
-        #Take the password, salt it, and assign it as new password
-        bytes_password = password.encode()
-        hash_password = bcrypt.hashpw(bytes_password, bcrypt.gensalt() )
-
-        db = operatorsDB()
-        check = db.loginUser(username, hash_password)
 
 def run():
     listen = ('0.000', 8080)

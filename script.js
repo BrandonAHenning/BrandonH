@@ -224,6 +224,26 @@ getInput = function(){
 }
 
 
+register_getInput = function(){
+	registerClientInfo = {
+	"email": reg_Input1.value,
+	"first_name": reg_Input2.value,
+	"last_name": reg_Input3.value,
+	"password": reg_Input4.value,
+	}
+	console.log("Register Input: ", registerClientInfo)
+	return registerClientInfo
+}
+
+login_getInput = function(){
+	loginClientInfo = {
+	"email": login_Input1.value,
+	"password": login_Input2.value,
+	}
+	console.log("login Input: ", loginClientInfo)
+	return loginClientInfo
+}
+
 resetInput = function(){
 
 	Input1.innerHTML = ""
@@ -236,12 +256,19 @@ resetInput = function(){
 
 Create.onclick = function(){
 	the_input = getInput()
-	//if (edit_mode == true) { //NEED TO RETRIVE THE ID OTHERWISE IT CAn'T DO ANYTHING. LOOK AT DELETE
-	//	overrideOps(the_input)
-	//}
-	//else {
 	createOps(the_input)
-	//}
+	resetInput()
+}
+
+reg_Create.onclick = function(){
+	the_input = register_getInput()
+	registerClient(the_input) //CHANGE FUNCTION
+	resetInput()
+}
+
+login_Create.onclick = function(){
+	the_input = login_getInput()
+	createOps(the_input) //CHANGE FUNCTION
 	resetInput()
 }
 
@@ -274,6 +301,60 @@ var createOps = function(opsClientInfo) {
 		headers: {"content-type":"application/x-www-form-urlencoded"}
 	}).then(function (response) {
 		console.log("Cool, you were able create something:", Data)
+		//Refresh The page
+		getOps() //get all current info so once it refresh it up to date
+		refreshPage(list_of_ops)
+  	});
+};
+
+//////////////////////CREATE ACCOUNT/USERNAME////////////////////////////
+
+var registerClient = function(registerClientInfo) {
+
+	var Data = 'email=' + encodeURIComponent(registerClientInfo['email']) +
+		'&first_name=' + encodeURIComponent(registerClientInfo['first_name']) +
+		'&last_name=' + encodeURIComponent(registerClientInfo['last_name']) +
+		'&password=' + encodeURIComponent(registerClientInfo['password']);
+
+	fetch(`http://localhost:8080/users/${registerClientInfo.email}`
+		,{
+		method: "POST",
+		body: Data,
+		headers: {"content-type":"application/x-www-form-urlencoded"}
+	}).then(function (response) {
+		if (response.status == 404) {
+			//NOT PERFORM ERROR ON CLIENT WHEN GET 404?
+			//Function work if succesful, but if 404 it doesn't perfrom function
+			form_fail("register", "register")}
+		else
+			{console.log("You create an account", Data)}
+
+		//Refresh The page
+		getOps() //get all current info so once it refresh it up to date
+		refreshPage(list_of_ops)
+  	});
+};
+
+//////////////////////LOGIN THE USER////////////////////////////
+
+var loginClient = function(loginClientInfo) {
+
+	var Data = 'email=' + encodeURIComponent(loginClientInfo['email']) +
+		'&password=' + encodeURIComponent(loginClientInfo['password']);
+
+	fetch(`http://localhost:8080/sessions}`
+		,{
+		method: "POST",
+		body: Data,
+		headers: {"content-type":"application/x-www-form-urlencoded"}
+	}).then(function (response) {
+		if (response.status == 404) {
+			//NOT PERFORM ERROR ON CLIENT WHEN GET 404?
+			//Function work if succesful, but if 404 it doesn't perfrom function
+			form_fail("login", "login")}
+		else
+			{console.log("You login", Data)}
+
 		//Refresh The page
 		getOps() //get all current info so once it refresh it up to date
 		refreshPage(list_of_ops)
@@ -439,7 +520,6 @@ var checkForOpsPics = function(name){
 	name = name.toLowerCase()
 
 	for (x=0; x < ops_pic.length; x++){
-		console.log("I made loop this amount of time: ", x)
 		if (name == ops_pic[x]['name']){
 			filepath = ops_pic[x]['filepath']
 		}
