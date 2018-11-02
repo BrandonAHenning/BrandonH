@@ -4,8 +4,49 @@ import json
 from database import operatorsDB
 from passlib.hash import bcrypt
 import bcrypt
+from session_store import SessionStore
+from http import cookies
 
+#GLOBAL VAR
+global_SessionStore = SessionStore() #inital {}
+
+#CLASS
 class MyHandler(BaseHTTPRequestHandler):
+
+    def load_cookie(self):
+        if "Cookie" in self.headers:
+            self.cookie = cookies.SimpleCookie(self.headers["Cookie"])
+        else:
+            self.cookie = cookies.SimpleCookie()
+
+    def send_cookie(self):
+        for morsel in self.cookie.values():
+            self.send_header("Set-Cookie", morsel.OutputString() )
+
+    def loadSession(self):
+        #Goal: assign self.session according to session Id
+        self.load_cookie() #try to load it
+        if "session_Id" in self.cookie:
+            session_Id = self.cookie["session_Id"].value
+            self.session = gSessionStore.getSession(sessionId)
+        elif self.session == None:
+            #Client Has no session ID that match
+            session_Id = gSessionStore.createSession()
+            self.session = gSessionStore.getSession(session_Id)
+            self.cookie["session_Id"] = session
+        else:
+            #Client Has no session Id yet
+            session_Id = gSessionStore.createSession()
+            self.session = gSessionStore.getSession(session_Id)
+            self.cookie["session_Id"] = session
+
+
+    #
+    #REMEMBER TO PUT self.load_session() for EVERY do_ function include OPTION
+    #SEND COOKIE BEFORE EACH AND EVERY END_HEADERTS
+    #
+    #
+    #
 
     def do_OPTIONS(self):
         print("The Option Methods has been activite...")
@@ -235,8 +276,6 @@ class MyHandler(BaseHTTPRequestHandler):
                 self.send_header('Access-Control-Allow-Origin', '*')
                 self.end_headers()
                 print("You have successfully login for '1 sec' ")
-
-
 
 def run():
     listen = ('0.000', 8080)

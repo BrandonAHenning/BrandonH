@@ -47,11 +47,8 @@ class operatorsDB():
         return self.cursor.fetchone()
 
     def checkPassword(self,username, hash_password):
-        check = self.cursor.execute("SELECT * FROM users WHERE username = ? AND hash_password= ?", [username, hash_password])
-        if check == None:
-            return False
-        else:
-            return hash_password
+        self.cursor.execute("SELECT * FROM users WHERE username = ? AND hash_password= ?", [username, hash_password])
+        return self.cursor.fetchone()
 
     def registerUser(self, username, first_name, last_name, hash_password):
         self.cursor.execute("INSERT INTO users (username, first_name, last_name, hash_password) VALUES (?,?,?,?)", [username, first_name, last_name, hash_password])
