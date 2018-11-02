@@ -74,6 +74,11 @@ function openTab(evt, name ) {
 
 ////////////////////WARNING MESSAGE FOR FORMS//////////////////
 
+
+
+
+//MAKE A MESSAGE WHENEVER THEY SUCCESFFUL CREATE A ACCOUNT also reset the inputs
+
 var warning_message = function(message, form){
 	var warningContainer = document.querySelector(".warningContainer_" + form)
 	console.log(warningContainer)
@@ -268,7 +273,7 @@ reg_Create.onclick = function(){
 
 login_Create.onclick = function(){
 	the_input = login_getInput()
-	createOps(the_input) //CHANGE FUNCTION
+	loginClient(the_input) //CHANGE FUNCTION
 	resetInput()
 }
 
@@ -323,6 +328,7 @@ var registerClient = function(registerClientInfo) {
 		headers: {"content-type":"application/x-www-form-urlencoded"}
 	}).then(function (response) {
 		if (response.status == 404) {
+			console.log("404 status response, register")
 			//NOT PERFORM ERROR ON CLIENT WHEN GET 404?
 			//Function work if succesful, but if 404 it doesn't perfrom function
 			form_fail("register", "register")}
@@ -342,7 +348,7 @@ var loginClient = function(loginClientInfo) {
 	var Data = 'email=' + encodeURIComponent(loginClientInfo['email']) +
 		'&password=' + encodeURIComponent(loginClientInfo['password']);
 
-	fetch(`http://localhost:8080/sessions}`
+	fetch(`http://localhost:8080/sessions`
 		,{
 		method: "POST",
 		body: Data,

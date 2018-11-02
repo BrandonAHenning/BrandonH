@@ -207,34 +207,41 @@ class MyHandler(BaseHTTPRequestHandler):
             operators = db.registerUser(username, first_name, last_name, hash_password)
             print(username, " has been succesfully register")
 
-    def loginUser(self, username, password):
+    def loginUser(self):
+        length = self.headers["content-length"]
+        body = self.rfile.read(int(length)).decode("utf-8") 
+        data = parse_qs(body) #Parse it as a dictonary
+        username = data['email'][0]
+        password = data['password'][0] 
+        print("user: ", username, "password: ", password)
+
         db = operatorsDB()
         check = db.checkUsername(username)
+        print("check is: ", check)
         if check == None:
             self.handleNotFound()
-            print("Username/Password Is Not Wrong")
+            print("Username/Password Is Not Wrong 1")
         else:
             bytes_password = password.encode()
             hash_password = bcrypt.hashpw(bytes_password, bcrypt.gensalt() )
-            #DO YOU GRAB THE USERNAME AND PASSWORD
-            #OR MAYBE YOU GRAB PASSWORD AND VERIFY IT
-            #IS IT TRUE THEY GRAB THEY CAN GRAB ANY USErNAME OR PASSWORD FROM DB THOUGH?
-            bcrypt.verify()
-            check = db.checkPassword(username, hash_password)
-            if check == None:
+            check = db.checkPassword(username, hash_password) #return as Dict of all atrbites
+            print(check["hash_password"])
+
+            bcrypt.checkpw(bytes_password, check['hash_password']) #you look in dic of check_password
+
+            #Why would I need Bcrypt.Checkpw when I could just hash the password and 
+            #check it through the database to see it match? ? = username, ? = password
+
+            print("2nd phrase of check is:", check)
+
+            if check == False:
                 self.handleNotFound()
-                print("Username/Password Is Not Wrong")
+                print("Username/Password Is Not Wrong 2")
             else:
                 self.send_response(201)
                 self.send_header('Access-Control-Allow-Origin', '*')
-                length = self.headers["content-length"]
-                body = self.rfile.read(int(length)).decode("utf-8")
                 self.end_headers()
-
-                data = parse_qs(body) #Parse it as a dictonary
-
-                username = data['email'][0]
-                password = data['hash_password'][0] #MIGHT BE A PROBLEM??
+                print("You have successfully login for '1 sec' ")
 
 
 
