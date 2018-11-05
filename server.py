@@ -8,7 +8,7 @@ from session_store import SessionStore
 from http import cookies
 
 #GLOBAL VAR
-global_SessionStore = SessionStore() #inital {}
+gSessionStore = SessionStore() #inital {}
 
 #CLASS
 class MyHandler(BaseHTTPRequestHandler):
@@ -29,27 +29,25 @@ class MyHandler(BaseHTTPRequestHandler):
         if "session_Id" in self.cookie:
             session_Id = self.cookie["session_Id"].value
             self.session = gSessionStore.getSession(sessionId)
-        elif self.session == None:
-            #Client Has no session ID that match
-            session_Id = gSessionStore.createSession()
-            self.session = gSessionStore.getSession(session_Id)
-            self.cookie["session_Id"] = session
+            if self.session == None:
+                print("self.sesson == None")
+                #Client Has no session ID that match
+                session_Id = gSessionStore.createSession()
+                self.session = gSessionStore.getSession(session_Id)
+                self.cookie["session_Id"] = session
         else:
             #Client Has no session Id yet
             session_Id = gSessionStore.createSession()
+            print("Create ID, your id is now: ", session_Id)
             self.session = gSessionStore.getSession(session_Id)
-            self.cookie["session_Id"] = session
+            print("No session id found in Cookie. Cookie SHOULD have self.session now = ", self.session)
+            self.cookie["session_Id"] = self.session
+        print("SESSIONS ID: ", self.session)
+        print("Group of SESSIONS: ",gSessionStore.sessions)
 
-
-    #
-    #REMEMBER TO PUT self.load_session() for EVERY do_ function include OPTION
-    #SEND COOKIE BEFORE EACH AND EVERY END_HEADERTS
-    #
-    #
-    #
 
     def do_OPTIONS(self):
-        print("The Option Methods has been activite...")
+        self.loadSession()
         self.send_response(200)
         self.send_header("Access-Control-Allow-Origin","*")
         self.send_header("Access-Control-Allow-Headers","Content-type")
@@ -59,6 +57,7 @@ class MyHandler(BaseHTTPRequestHandler):
         return
 
     def do_GET(self):
+        self.loadSession()
         #GET 
         if self.path == "/operators":
             self.handleOperators_LIST()
@@ -72,20 +71,22 @@ class MyHandler(BaseHTTPRequestHandler):
             self.handleNotFound()
 
     def do_POST(self):
+        self.loadSession()
         #POST
         if self.path == "/operators":
             self.handleOperators_CREATE()
-        #SESSIONS
-        elif self.path == "/sessions":
-            self.loginUser()
         #REGISTER
         elif self.path == "/users":
             self.registerUser()
+        #SESSIONS
+        elif self.path == "/sessions":
+            self.loginUser()
         #404
         else:
             self.handleNotFound()
 
     def do_PUT(self):
+        self.loadSession()
         #PUT
         if self.path.startswith("/operators"):
             operators_path = self.path.split("/")
@@ -96,6 +97,7 @@ class MyHandler(BaseHTTPRequestHandler):
             self.handleNotFound()
 
     def do_DELETE(self):
+        self.loadSession()
         #DELETE
         if self.path.startswith("/operators"):
             operators_path = self.path.split("/")
@@ -106,11 +108,18 @@ class MyHandler(BaseHTTPRequestHandler):
             self.handleNotFound()
 
     def handleNotFound(self):
+        self.loadSession()
         self.send_response(404)
         self.send_header("content-type", "text/html")
         self.end_headers()
         self.wfile.write(bytes("404 Not Found.","utf-8"))
 
+    def handleCantCreate(self):
+        self.loadSession()
+        self.send_response(402)
+        self.send_header("content-type", "text/html")
+        self.end_headers()
+        self.wfile.write(bytes("404 Not Found.","utf-8"))
 
     def handleOperators_LIST(self):
         self.send_response(200)
@@ -230,8 +239,8 @@ class MyHandler(BaseHTTPRequestHandler):
 
         check = db.checkUsername(username)
         if check != None:
-            self.handleNotFound()
-            print("404 is beinng trigger because a user is already in database for register")
+            self.handleCantCreate()
+            print("402 is beinng trigger because a user is already in database for register")
         else:
             self.send_response(201)
             self.send_header('Access-Control-Allow-Origin', '*')
@@ -255,27 +264,31 @@ class MyHandler(BaseHTTPRequestHandler):
         password = data['password'][0] 
 
         db = operatorsDB()
-        check = db.checkUsername(username)
+        user = db.checkUsername(username)
 
-        print("check is: ", check)
-        if check == None:
-            self.handleNotFound()
+        print("check is: ", user)
+        if user == None:
+            self.handleCantCreate()
             print("Username/Password Is Not Wrong 1")
         else:
             #Grab password from database, it is bytes
-            check_password = check['hash_password']
+            user_password = user['hash_password']
 
             #Comapre the given password and hashpassword. They both are in bytes. Not UTF-8
-            check = bcrypt.checkpw(password.encode(), check_password)
+            check = bcrypt.checkpw(password.encode(), user_password)
 
             if check == False:
-                self.handleNotFound()
+                self.handleCantCreate()
                 print("Username/Password Is Not Wrong 2")
             else:
                 self.send_response(201)
                 self.send_header('Access-Control-Allow-Origin', '*')
+                self.session["user_Id"] = user["id"]
                 self.end_headers()
-                print("You have successfully login for '1 sec' ")
+
+    def end_headers(self): #everytime a end_headers appear in code, make it so it send cookie before hand.
+        self.send_cookie()
+        BaseHTTPRequestHandler.end_headers(self)
 
 def run():
     listen = ('0.000', 8080)
