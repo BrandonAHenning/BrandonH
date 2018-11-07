@@ -28,13 +28,13 @@ class MyHandler(BaseHTTPRequestHandler):
         self.load_cookie() #try to load it
         if "session_Id" in self.cookie:
             session_Id = self.cookie["session_Id"].value
-            self.session = gSessionStore.getSession(sessionId)
+            self.session = gSessionStore.getSession(session_Id)
             if self.session == None:
                 print("self.sesson == None")
                 #Client Has no session ID that match
                 session_Id = gSessionStore.createSession()
                 self.session = gSessionStore.getSession(session_Id)
-                self.cookie["session_Id"] = session
+                self.cookie["session_Id"] = self.session #IS SELF.SESSION THE RIGHT ONE?
         else:
             #Client Has no session Id yet
             session_Id = gSessionStore.createSession()
@@ -42,6 +42,11 @@ class MyHandler(BaseHTTPRequestHandler):
             self.session = gSessionStore.getSession(session_Id)
             print("No session id found in Cookie. Cookie SHOULD have self.session now = ", self.session)
             self.cookie["session_Id"] = self.session
+
+
+
+            ############ASK FOR HELP ON HOW THIS CODE NOT WORKING. MIGHT BE TIED TO STORE_SESSION CODE ALSO$$$$$$$$$$$$$$$$$
+
         print("SESSIONS ID: ", self.session)
         print("Group of SESSIONS: ",gSessionStore.sessions)
 
@@ -49,7 +54,6 @@ class MyHandler(BaseHTTPRequestHandler):
     def do_OPTIONS(self):
         self.loadSession()
         self.send_response(200)
-        self.send_header("Access-Control-Allow-Origin","*")
         self.send_header("Access-Control-Allow-Headers","Content-type")
         self.send_header("Access-Control-Allow-Methods","GET, POST, PUT, DELETE, OPTIONS")
         self.end_headers()
@@ -114,9 +118,16 @@ class MyHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(bytes("404 Not Found.","utf-8"))
 
+    def handleAuthenticationFail(self):
+        self.loadSession()
+        self.send_response(401)
+        self.send_header("content-type", "text/html")
+        self.end_headers()
+        self.wfile.write(bytes("404 Not Found.","utf-8"))
+
     def handleCantCreate(self):
         self.loadSession()
-        self.send_response(402)
+        self.send_response(422)
         self.send_header("content-type", "text/html")
         self.end_headers()
         self.wfile.write(bytes("404 Not Found.","utf-8"))
@@ -124,9 +135,7 @@ class MyHandler(BaseHTTPRequestHandler):
     def handleOperators_LIST(self):
         self.send_response(200)
         self.send_header("content-type", "application/json")
-        self.send_header('Access-Control-Allow-Origin', '*')
         self.end_headers()
-
 
         #Initlize/Create Database
         db = operatorsDB()
@@ -138,7 +147,6 @@ class MyHandler(BaseHTTPRequestHandler):
 
     def handleOperators_CREATE(self):
         self.send_response(201)
-        self.send_header('Access-Control-Allow-Origin', '*')
         length = self.headers["content-length"]
         body = self.rfile.read(int(length)).decode("utf-8")
         self.end_headers()
@@ -167,7 +175,6 @@ class MyHandler(BaseHTTPRequestHandler):
         else:
             self.send_response(200)
             self.send_header("content-type", "application/json")
-            self.send_header('Access-Control-Allow-Origin', '*')
             self.end_headers()
             print("IT PAST for RETRIVE opcheck")
 
@@ -187,7 +194,6 @@ class MyHandler(BaseHTTPRequestHandler):
         else:
             print("DEBUG: It about to SEND THE RESPONSE")
             self.send_response(200)
-            self.send_header('Access-Control-Allow-Origin', '*')
             self.send_header("content-type", "application/x-www-form-urlencoded")
             self.end_headers()
             print("DEBUG: HEADER HAS BEEN SENT")
@@ -206,7 +212,6 @@ class MyHandler(BaseHTTPRequestHandler):
             self.handleNotFound()
         else:
             self.send_response(201)
-            self.send_header('Access-Control-Allow-Origin', '*')
             length = self.headers["content-length"]
             body = self.rfile.read(int(length)).decode("utf-8") 
             self.end_headers()
@@ -240,10 +245,9 @@ class MyHandler(BaseHTTPRequestHandler):
         check = db.checkUsername(username)
         if check != None:
             self.handleCantCreate()
-            print("402 is beinng trigger because a user is already in database for register")
+            print("422 is beinng trigger because a user is already in database for register")
         else:
             self.send_response(201)
-            self.send_header('Access-Control-Allow-Origin', '*')
             self.end_headers()
 
             #Take the password, salt it, and assign it as new password
@@ -268,7 +272,7 @@ class MyHandler(BaseHTTPRequestHandler):
 
         print("check is: ", user)
         if user == None:
-            self.handleCantCreate()
+            self.handleAuthenticationFail()
             print("Username/Password Is Not Wrong 1")
         else:
             #Grab password from database, it is bytes
@@ -278,16 +282,17 @@ class MyHandler(BaseHTTPRequestHandler):
             check = bcrypt.checkpw(password.encode(), user_password)
 
             if check == False:
-                self.handleCantCreate()
+                self.handleAuthenticationFail()
                 print("Username/Password Is Not Wrong 2")
             else:
                 self.send_response(201)
-                self.send_header('Access-Control-Allow-Origin', '*')
                 self.session["user_Id"] = user["id"]
                 self.end_headers()
 
     def end_headers(self): #everytime a end_headers appear in code, make it so it send cookie before hand.
         self.send_cookie()
+        self.send_header('Access-Control-Allow-Origin', self.headers["Origin"])
+        self.send_header("Access-Control-Allow-Credentials", 'true')
         BaseHTTPRequestHandler.end_headers(self)
 
 def run():

@@ -285,7 +285,9 @@ login_Create.onclick = function(){
 //////////////FETCH GET//////////////////
 
 var getOps = function(opsClientInfo){
-fetch("http://localhost:8080/operators").then(function (response) {
+fetch("http://localhost:8080/operators",{
+	//credentials: 'include'
+	}).then(function (response) {
 	response.json().then(function(theData){
 	  	list_of_ops = theData;
 
@@ -308,7 +310,8 @@ var createOps = function(opsClientInfo) {
 	fetch("http://localhost:8080/operators",{
 		method: "POST",
 		body: Data,
-		headers: {"content-type":"application/x-www-form-urlencoded"}
+		headers: {"content-type":"application/x-www-form-urlencoded"},
+		credentials: 'include'
 	}).then(function (response) {
 		console.log("Cool, you were able create something:", Data)
 		//Refresh The page
@@ -330,7 +333,8 @@ var registerClient = function(registerClientInfo) {
 		,{
 		method: "POST",
 		body: Data,
-		headers: {"content-type":"application/x-www-form-urlencoded"}
+		headers: {"content-type":"application/x-www-form-urlencoded"},
+		credentials: 'include'
 	}).then(function (response) {
 		console.log("You create an account", Data)
 
@@ -357,7 +361,8 @@ var loginClient = function(loginClientInfo) {
 		,{
 		method: "POST",
 		body: Data,
-		headers: {"content-type":"application/x-www-form-urlencoded"}
+		headers: {"content-type":"application/x-www-form-urlencoded"},
+		credentials: 'include'
 	}).then(function (response) {
 		console.log("You login", Data)
 
@@ -380,7 +385,8 @@ var deleteOps = function(opsClientInfo) {
 		console.log("Deleting Ops with ID", opsClientInfo.id);
 		fetch(`http://localhost:8080/operators/${opsClientInfo.id}`
 			,{
-			method: "DELETE"
+			method: "DELETE",
+			credentials: 'include'
 		}).then(function () {
 			console.log("Cool, you were able delete the operartor")
 
@@ -424,7 +430,8 @@ var editOps = function(opsClientInfo) {
 		,{
 		method: "PUT",
 		body: Data,
-		headers: {"content-type":"application/x-www-form-urlencoded"}
+		headers: {"content-type":"application/x-www-form-urlencoded"},
+		credentials: 'include'
 	}).then(function (response) {
 		console.log("Cool, you were able modify something:", Data)
 
