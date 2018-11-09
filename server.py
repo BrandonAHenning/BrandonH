@@ -16,8 +16,10 @@ class MyHandler(BaseHTTPRequestHandler):
     def load_cookie(self):
         if "Cookie" in self.headers:
             self.cookie = cookies.SimpleCookie(self.headers["Cookie"])
+            print("COOKIE IS FOUND")
         else:
             self.cookie = cookies.SimpleCookie()
+            print("NO COOKIE FOUND")
 
     def send_cookie(self):
         for morsel in self.cookie.values():
@@ -26,6 +28,7 @@ class MyHandler(BaseHTTPRequestHandler):
     def loadSession(self):
         #Goal: assign self.session according to session Id
         self.load_cookie() #try to load it
+        print("Cookie is: ", self.cookie)
         if "session_Id" in self.cookie:
             session_Id = self.cookie["session_Id"].value
             self.session = gSessionStore.getSession(session_Id)
@@ -34,21 +37,18 @@ class MyHandler(BaseHTTPRequestHandler):
                 #Client Has no session ID that match
                 session_Id = gSessionStore.createSession()
                 self.session = gSessionStore.getSession(session_Id)
-                self.cookie["session_Id"] = self.session #IS SELF.SESSION THE RIGHT ONE?
+                self.cookie["session_Id"] = session_Id #IS SELF.SESSION THE RIGHT ONE?
         else:
             #Client Has no session Id yet
             session_Id = gSessionStore.createSession()
             print("Create ID, your id is now: ", session_Id)
             self.session = gSessionStore.getSession(session_Id)
             print("No session id found in Cookie. Cookie SHOULD have self.session now = ", self.session)
-            self.cookie["session_Id"] = self.session
+            self.cookie["session_Id"] = session_Id
 
-
-
-            ############ASK FOR HELP ON HOW THIS CODE NOT WORKING. MIGHT BE TIED TO STORE_SESSION CODE ALSO$$$$$$$$$$$$$$$$$
-
-        print("SESSIONS ID: ", self.session)
+        print("\nSESSIONS ID: ", self.session)
         print("Group of SESSIONS: ",gSessionStore.sessions)
+        print("-----------------------------------------------------")
 
 
     def do_OPTIONS(self):
@@ -112,27 +112,28 @@ class MyHandler(BaseHTTPRequestHandler):
             self.handleNotFound()
 
     def handleNotFound(self):
-        self.loadSession()
         self.send_response(404)
         self.send_header("content-type", "text/html")
         self.end_headers()
         self.wfile.write(bytes("404 Not Found.","utf-8"))
 
     def handleAuthenticationFail(self):
-        self.loadSession()
         self.send_response(401)
         self.send_header("content-type", "text/html")
         self.end_headers()
         self.wfile.write(bytes("404 Not Found.","utf-8"))
 
     def handleCantCreate(self):
-        self.loadSession()
         self.send_response(422)
         self.send_header("content-type", "text/html")
         self.end_headers()
         self.wfile.write(bytes("404 Not Found.","utf-8"))
 
     def handleOperators_LIST(self):
+        if "user_Id" not in self.session:
+            print("Not login")
+            return self.handleAuthenticationFail()
+
         self.send_response(200)
         self.send_header("content-type", "application/json")
         self.end_headers()
@@ -261,6 +262,7 @@ class MyHandler(BaseHTTPRequestHandler):
             print(username, " has been succesfully register")
 
     def loginUser(self):
+        print("made it")
         length = self.headers["content-length"]
         body = self.rfile.read(int(length)).decode("utf-8") 
         data = parse_qs(body) #Parse it as a dictonary
@@ -270,24 +272,25 @@ class MyHandler(BaseHTTPRequestHandler):
         db = operatorsDB()
         user = db.checkUsername(username)
 
-        print("check is: ", user)
         if user == None:
             self.handleAuthenticationFail()
-            print("Username/Password Is Not Wrong 1")
+            print("username")
         else:
             #Grab password from database, it is bytes
             user_password = user['hash_password']
 
             #Comapre the given password and hashpassword. They both are in bytes. Not UTF-8
             check = bcrypt.checkpw(password.encode(), user_password)
+            print("made it2")
 
             if check == False:
                 self.handleAuthenticationFail()
-                print("Username/Password Is Not Wrong 2")
+                print("password")
             else:
                 self.send_response(201)
                 self.session["user_Id"] = user["id"]
                 self.end_headers()
+                print("made it 3")
 
     def end_headers(self): #everytime a end_headers appear in code, make it so it send cookie before hand.
         self.send_cookie()

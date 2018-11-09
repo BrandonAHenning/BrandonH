@@ -286,7 +286,7 @@ login_Create.onclick = function(){
 
 var getOps = function(opsClientInfo){
 fetch("http://localhost:8080/operators",{
-	//credentials: 'include'
+	credentials: 'include'
 	}).then(function (response) {
 	response.json().then(function(theData){
 	  	list_of_ops = theData;
