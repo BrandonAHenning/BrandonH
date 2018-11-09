@@ -68,6 +68,13 @@ body{
 	border-right:1px solid #ccc;
 	border-left:1px solid #ccc;
 }
+.disabled{
+	color:#777;
+	background-color:#0d0d0d;
+}
+.disabled:hover{
+	color:#777 !important;
+}
 
 .tab:hover{
 	color:#fff;
@@ -120,7 +127,7 @@ body{
 #FormContainer button, #FormContainer_Register button, #FormContainer_Login button{
 	background-color:#1a1d22;
 	border:2px solid #ccc;
-	margin:0 0 20px 90px ;
+	margin:0 0 20px 40px ;
 	color:#ccc;
 	cursor:pointer;
 }

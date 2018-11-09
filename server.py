@@ -107,6 +107,9 @@ class MyHandler(BaseHTTPRequestHandler):
             operators_path = self.path.split("/")
             operators_id = operators_path[2]
             self.handleOperators_DELETE(operators_id)
+        #SESSIONS
+        elif self.path == "/sessions":
+            self.logoutUser()
         #404
         else:
             self.handleNotFound()
@@ -132,93 +135,32 @@ class MyHandler(BaseHTTPRequestHandler):
     def handleOperators_LIST(self):
         if "user_Id" not in self.session:
             print("Not login")
-            return self.handleAuthenticationFail()
-
-        self.send_response(200)
-        self.send_header("content-type", "application/json")
-        self.end_headers()
-
-        #Initlize/Create Database
-        db = operatorsDB()
-        operators = db.getOperators()
-        self.wfile.write(bytes(json.dumps(operators),"utf-8"))
-
-        #Get the pictures from database
-        
-
-    def handleOperators_CREATE(self):
-        self.send_response(201)
-        length = self.headers["content-length"]
-        body = self.rfile.read(int(length)).decode("utf-8")
-        self.end_headers()
-
-        data = parse_qs(body) #Parse it as a dictonary
-        print("DEBUG: " + str(data))
-
-        name = data['name'][0]
-        country  = data['country'][0]
-        side = data['side'][0]
-        weapon = data['weapon'][0]
-        age = data['age'][0]
-
-        #Initlize/Create Database
-        db = operatorsDB()
-        print("The Ops is being Created")
-        db.createOperators(name, country, side, weapon, age)
-
-    def handleOperators_RETRIVE(self, operators_id):
-        db = operatorsDB()
-        op_check = db.retriveOperators(operators_id)
-
-        if op_check is None:
-            print("IT IS NONE for RETRIVE")
-            self.handleNotFound()
-        else:
+            self.handleAuthenticationFail()
+        else:   
             self.send_response(200)
             self.send_header("content-type", "application/json")
             self.end_headers()
-            print("IT PAST for RETRIVE opcheck")
 
             #Initlize/Create Database
             db = operatorsDB()
-            operators = db.retriveOperators(operators_id)
+            operators = db.getOperators()
             self.wfile.write(bytes(json.dumps(operators),"utf-8"))
 
-    def handleOperators_DELETE(self, operators_id):
-        print("DEBUG: It has reach the RETRIVE FUNCTION")
-        db = operatorsDB()
-        op_check = db.retriveOperators(operators_id)
+            #Get the pictures from database
+        
 
-        if op_check is None:
-            print("IT IS NONE")
-            self.handleNotFound()
-        else:
-            print("DEBUG: It about to SEND THE RESPONSE")
-            self.send_response(200)
-            self.send_header("content-type", "application/x-www-form-urlencoded")
-            self.end_headers()
-            print("DEBUG: HEADER HAS BEEN SENT")
-
-            #Initlize/Create Database
-            db = operatorsDB()
-            db.deleteOperators(operators_id)
-            print(operators_id + "Operators ID has been deleted from the database")
-
-    def handleOperators_PUT(self, operators_id):
-        db = operatorsDB()
-        op_check = db.retriveOperators(operators_id)
-
-        if op_check is None:
-            print("IT IS NONE for PUT")
-            self.handleNotFound()
+    def handleOperators_CREATE(self):
+        if "user_Id" not in self.session:
+            print("Not login")
+            self.handleAuthenticationFail()
         else:
             self.send_response(201)
             length = self.headers["content-length"]
-            body = self.rfile.read(int(length)).decode("utf-8") 
+            body = self.rfile.read(int(length)).decode("utf-8")
             self.end_headers()
 
-            data = parse_qs(body)
-            print("PUT DEBUG: " + str(data))
+            data = parse_qs(body) #Parse it as a dictonary
+            print("DEBUG: " + str(data))
 
             name = data['name'][0]
             country  = data['country'][0]
@@ -228,8 +170,85 @@ class MyHandler(BaseHTTPRequestHandler):
 
             #Initlize/Create Database
             db = operatorsDB()
-            print("The Ops is being modify")
-            operators = db.modifyOperators(operators_id, name, country, side, weapon, age)
+            print("The Ops is being Created")
+            db.createOperators(name, country, side, weapon, age)
+
+    def handleOperators_RETRIVE(self, operators_id):
+        if "user_Id" not in self.session:
+            print("Not login")
+            self.handleAuthenticationFail()
+        else:
+            db = operatorsDB()
+            op_check = db.retriveOperators(operators_id)
+
+            if op_check is None:
+                print("IT IS NONE for RETRIVE")
+                self.handleNotFound()
+            else:
+                self.send_response(200)
+                self.send_header("content-type", "application/json")
+                self.end_headers()
+                print("IT PAST for RETRIVE opcheck")
+
+                #Initlize/Create Database
+                db = operatorsDB()
+                operators = db.retriveOperators(operators_id)
+                self.wfile.write(bytes(json.dumps(operators),"utf-8"))
+
+    def handleOperators_DELETE(self, operators_id):
+        if "user_Id" not in self.session:
+            print("Not login")
+            self.handleAuthenticationFail()
+        else:
+            print("DEBUG: It has reach the RETRIVE FUNCTION")
+            db = operatorsDB()
+            op_check = db.retriveOperators(operators_id)
+
+            if op_check is None:
+                print("IT IS NONE")
+                self.handleNotFound()
+            else:
+                print("DEBUG: It about to SEND THE RESPONSE")
+                self.send_response(200)
+                self.send_header("content-type", "application/x-www-form-urlencoded")
+                self.end_headers()
+                print("DEBUG: HEADER HAS BEEN SENT")
+
+                #Initlize/Create Database
+                db = operatorsDB()
+                db.deleteOperators(operators_id)
+                print(operators_id + "Operators ID has been deleted from the database")
+
+    def handleOperators_PUT(self, operators_id):
+        if "user_Id" not in self.session:
+            print("Not login")
+            self.handleAuthenticationFail()
+        else:
+            db = operatorsDB()
+            op_check = db.retriveOperators(operators_id)
+
+            if op_check is None:
+                print("IT IS NONE for PUT")
+                self.handleNotFound()
+            else:
+                self.send_response(201)
+                length = self.headers["content-length"]
+                body = self.rfile.read(int(length)).decode("utf-8") 
+                self.end_headers()
+
+                data = parse_qs(body)
+                print("PUT DEBUG: " + str(data))
+
+                name = data['name'][0]
+                country  = data['country'][0]
+                side = data['side'][0]
+                weapon = data['weapon'][0]
+                age = data['age'][0]
+
+                #Initlize/Create Database
+                db = operatorsDB()
+                print("The Ops is being modify")
+                operators = db.modifyOperators(operators_id, name, country, side, weapon, age)
             
     def registerUser(self):
         length = self.headers["content-length"]
@@ -291,6 +310,16 @@ class MyHandler(BaseHTTPRequestHandler):
                 self.session["user_Id"] = user["id"]
                 self.end_headers()
                 print("made it 3")
+
+    def logoutUser(self):
+        if "user_Id" in self.session:
+            self.send_response(200)
+            self.session.pop("user_Id", None) #BAD CAUSE IT MIGHT LOG EVERY ONE OUT
+            #IT WORKS ACTUALLY, BUT THE OLD SESSION STILL EXIST. YOU MIGHT WANT TO
+            #DELETE THE OLD SESSION.
+            self.end_headers()
+        else:
+            self.handleAuthenticationFail()
 
     def end_headers(self): #everytime a end_headers appear in code, make it so it send cookie before hand.
         self.send_cookie()

@@ -1,4 +1,9 @@
 //////////////Define Objects and see if it working////////////////
+//1st go back and fix all the satus code for IF/ELSE for each fetch
+//While doing that, see if you can take the REFRESH PAGE and put it only if it successful
+//If your able do the above method. Then put open_service_tab in refresh page.
+//if not, then you must put open_service_tab everytime there a successful METHOD
+
 console.log("It works!");
 
 Input1 = document.querySelector("#Input1");
@@ -35,6 +40,18 @@ var edit_mode = false;
 var opsClientInfo;
 
 //////////////////////////OPEN TABS////////////////////////////
+
+var open_service_tab = function(){
+	document.querySelectorAll(".tab")[2].classList.remove("disabled")
+	document.querySelectorAll(".tab")[2].disabled = false;
+}
+
+var disable_service_tab = function(){
+	document.querySelectorAll(".tab")[2].classList.add("disabled")
+	document.querySelectorAll(".tab")[2].disabled = true;
+	document.querySelectorAll(".tab")[1].click();
+}
+
 function openTab(evt, name ) {
 	// Declare all variables
 	var i, tabContent, tab;
@@ -62,7 +79,6 @@ function openTab(evt, name ) {
 
 	console.log("It ends")
 }
-
 
 //MAKE A MESSAGE WHENEVER THEY SUCCESFFUL CREATE A ACCOUNT also reset the inputs
 
@@ -93,6 +109,11 @@ var form_action = function(error, form, state){ //form = [NAME] Make sure it str
 		message = "Your username or password is wrong, try again."}
 	else if (error == "success_login"){
 		message = "You have login!"}
+
+	else if (error == "success_logout"){
+		message = "You have logout!"}
+	else if (error == "fail_logout"){
+		message = "You have not login in the first place!"}
 
 	else if (error == "invaild"){
 		message = "You need to fill out the entire form"}
@@ -289,10 +310,14 @@ fetch("http://localhost:8080/operators",{
 	credentials: 'include'
 	}).then(function (response) {
 	response.json().then(function(theData){
-	  	list_of_ops = theData;
-
-		//UPDATE THE PAGE
-		refreshPage(list_of_ops)
+		if (response.status == 200){
+			list_of_ops = theData;
+			//UPDATE THE PAGE
+			refreshPage(list_of_ops)
+			}
+		else {
+			console.log("not log in")
+		}
   	});
 });
 };
@@ -336,18 +361,17 @@ var registerClient = function(registerClientInfo) {
 		headers: {"content-type":"application/x-www-form-urlencoded"},
 		credentials: 'include'
 	}).then(function (response) {
-		console.log("You create an account", Data)
+		if (response.status == 201) {
+			console.log("You create an account", Data)
 
-		delete_warning("register")
-		form_action("success_register", "register", true)
-
-		//Refresh The page
-		getOps() //get all current info so once it refresh it up to date
-		refreshPage(list_of_ops)
-  	}).catch(function(){
-		delete_warning("register")
-		form_action("fail_register", "register", false)
-	});
+			delete_warning("register")
+			form_action("success_register", "register", true)
+			}
+		else {
+			delete_warning("register")
+			form_action("fail_register", "register", false)
+			}
+  	});
 };
 
 //////////////////////LOGIN THE USER////////////////////////////
@@ -364,19 +388,54 @@ var loginClient = function(loginClientInfo) {
 		headers: {"content-type":"application/x-www-form-urlencoded"},
 		credentials: 'include'
 	}).then(function (response) {
-		console.log("You login", Data)
+		if (response.status == 201){
+			console.log("You login", Data)
+			delete_warning("login")
+			form_action("success_login", "login", true)
 
-		delete_warning("login")
-		form_action("success_login", "login", true)
+			//Refresh The page
+			getOps() //get all current info so once it refresh it up to date
+			refreshPage(list_of_ops)
+			}
+		else{
+			console.log("fail to login")
+			delete_warning("login")
+			form_action("fail_login", "login", false)}
 
-		//Refresh The page
-		getOps() //get all current info so once it refresh it up to date
-		refreshPage(list_of_ops)
-  	}).catch(function(){	
-		delete_warning("login")
-		form_action("fail_login", "login", false)
-	});
+  	});
 };
+
+//////////////////LOGIN LOGOUT//////////////////
+
+var logout_delete = document.querySelector("#logout_Delete")
+
+logout_delete.onclick = function(){
+	logoutClient()
+}
+
+var logoutClient = function() {
+	if (confirm("You sure you want to logout?")){
+		fetch(`http://localhost:8080/sessions`
+			,{
+			method: "DELETE",
+			credentials: 'include'
+		}).then(function (response) {
+			if (response.status == 200){
+				console.log("you logged out")
+				//Remove all info and reset to default
+				disable_service_tab()
+				deleteDisplay()
+				form_action("success_logout", "login", true)
+				}
+			else {
+				//Refresh The page
+				getOps() //get all current info so once it refresh it up to date
+				refreshPage(list_of_ops)
+				form_action("fail_logout", "login", false)
+			}
+  		});
+		}
+	};
 
 //////////////FETCH DELETE////////////////
 
@@ -388,6 +447,7 @@ var deleteOps = function(opsClientInfo) {
 			method: "DELETE",
 			credentials: 'include'
 		}).then(function () {
+			//There no IF/FAIL FUNCTION due to User unable to DELETE without GET 1st
 			console.log("Cool, you were able delete the operartor")
 
 			//Refresh The page
@@ -433,11 +493,16 @@ var editOps = function(opsClientInfo) {
 		headers: {"content-type":"application/x-www-form-urlencoded"},
 		credentials: 'include'
 	}).then(function (response) {
-		console.log("Cool, you were able modify something:", Data)
+		if (response.status == 201){
+			console.log("Cool, you were able modify something:", Data)
 
-		//Refresh The page
-		getOps() //get all current info so once it refresh it up to date
-		refreshPage(list_of_ops)
+			//Refresh The page
+			getOps() //get all current info so once it refresh it up to date
+			refreshPage(list_of_ops)
+			}
+		else {
+			console.log("not logged in")
+		}
   	});
 }
 
@@ -446,6 +511,7 @@ var editOps = function(opsClientInfo) {
 var refreshPage = function(list_of_ops){
 	deleteDisplay()
 	createDisplay(list_of_ops)
+	open_service_tab()
 }
 
 var createDisplay = function(list_of_ops){
@@ -581,6 +647,6 @@ var checkForWeaponPics = function(weapon){
 }
 
 ////////RUN ON PAGE LOAD////////////
-document.querySelectorAll(".tab")[2].click();
+document.querySelectorAll(".tab")[1].click();
 getOps()
 
