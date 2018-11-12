@@ -110,6 +110,9 @@ var form_action = function(error, form, state){ //form = [NAME] Make sure it str
 	else if (error == "success_login"){
 		message = "You have login!"}
 
+	else if (error == "login_more_info"){
+		message = "Please fill out both username and password"}
+
 	else if (error == "success_logout"){
 		message = "You have logout!"}
 	else if (error == "fail_logout"){
@@ -262,6 +265,8 @@ register_getInput = function(){
 }
 
 login_getInput = function(){
+	if (login_Input1.value == "" || login_Input2.value == "")
+		{return form_action("login_more_info", "login", false)}
 	loginClientInfo = {
 	"email": login_Input1.value,
 	"password": login_Input2.value,
