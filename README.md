@@ -61,7 +61,8 @@ logoutClient (method: DELETE, Path: http://localhost:8080/sessions )
 
 registerClient (method: POST, Path: http://localhost:8080/users )
 
-
+I used bcrypt to encrypt/hash/salt the password.
+My app also use cookies from http, os, and base64 for my python files.
 
 
 
