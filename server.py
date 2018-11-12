@@ -124,13 +124,13 @@ class MyHandler(BaseHTTPRequestHandler):
         self.send_response(401)
         self.send_header("content-type", "text/html")
         self.end_headers()
-        self.wfile.write(bytes("404 Not Found.","utf-8"))
+        self.wfile.write(bytes("401 Creditals Fail.","utf-8"))
 
     def handleCantCreate(self):
         self.send_response(422)
         self.send_header("content-type", "text/html")
         self.end_headers()
-        self.wfile.write(bytes("404 Not Found.","utf-8"))
+        self.wfile.write(bytes("422 Verfication Fail.","utf-8"))
 
     def handleOperators_LIST(self):
         if "user_Id" not in self.session:
